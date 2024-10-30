@@ -6,21 +6,40 @@ import paginate from "../../utils/pagination.js";
 const router = Router();
 
 // CRUD Operations
-// , authMiddleware
-router.get("/", async (req, res) => {
+
+router.get("/", authMiddleware, async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 
   try {
     // Find all itineraries
     const itineraries = await Itinerary.find({
-      userId: "6721262324176b361a00f2f1",
+      userId: req.user.id,
     });
-    console.log(itineraries);
 
     // Paginate
     const pagination = paginate(itineraries, parseInt(page), parseInt(limit));
 
     res.status(200).json(pagination);
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving itineraries" });
+  }
+});
+
+router.get("/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Find Itinerary
+    const itinerary = await Itinerary.findOne({
+      userId: req.user.id,
+      _id: id,
+    });
+
+    if (!itinerary) {
+      return res.status(404).json({ message: "Itinerary not found" });
+    }
+
+    res.status(200).json(itinerary);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving itineraries" });
   }
@@ -52,17 +71,13 @@ router.patch("/:id", authMiddleware, async (req, res) => {
 
   try {
     // Find itinerary to update
-    const itinerary = await Itinerary.findById(id);
+    const itinerary = await Itinerary.findOne({
+      userId: req.user.id,
+      _id: id,
+    });
 
     if (!itinerary) {
       return res.status(404).json({ message: "Itinerary not found" });
-    }
-
-    // Check for ownership
-    if (itinerary.userId.toString() !== req.user.id) {
-      return res
-        .status(403)
-        .json({ message: "Not authorized to update this itinerary" });
     }
 
     // Update itinerary, only if new value is provided
@@ -84,21 +99,17 @@ router.patch("/:id", authMiddleware, async (req, res) => {
 router.delete("/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
 
-  // Find itinerary to update
-  const itinerary = await Itinerary.findById(id);
-
-  if (!itinerary) {
-    return res.status(404).json({ message: "Itinerary not found" });
-  }
-
-  // Check for ownership
-  if (itinerary.userId.toString() !== req.user.id) {
-    return res
-      .status(403)
-      .json({ message: "Not authorized to update this itinerary" });
-  }
-
   try {
+    // Find itinerary to update
+    const itinerary = await Itinerary.findOne({
+      userId: req.user.id,
+      _id: id,
+    });
+
+    if (!itinerary) {
+      return res.status(404).json({ message: "Itinerary not found" });
+    }
+    
     await itinerary.deleteOne();
     res.status(200).json({ message: "Successfully deleted itinerary" });
   } catch (error) {

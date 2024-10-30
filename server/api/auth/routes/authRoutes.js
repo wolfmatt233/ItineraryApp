@@ -2,8 +2,24 @@ import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = Router();
+
+router.get("/user", authMiddleware, async (req, res) => {
+  try {
+    // Find the user
+    const user = await User.findById(req.user.id).select("-password -refreshToken -__v -itineraries");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Error finding user" });
+  }
+});
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;

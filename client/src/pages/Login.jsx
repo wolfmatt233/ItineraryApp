@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { usePage } from "../App";
+import SignUp from "./SignUp";
 
 export default function Login() {
   const { login } = useAuth();
+  const { setPage } = usePage();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -40,13 +43,15 @@ export default function Login() {
       />
       <button
         type="submit"
-        className="basic-button basic-input"
+        className="basic-button"
         onClick={loginApi}
       >
         Log In
       </button>
 
-      <button className="link-button">No account? Sign up here!</button>
+      <button className="link-button" onClick={() => setPage(<SignUp />)}>
+        No account? Sign up here!
+      </button>
     </form>
   );
 }

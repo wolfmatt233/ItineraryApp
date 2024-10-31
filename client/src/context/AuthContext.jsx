@@ -4,29 +4,65 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const checkLogin = async () => {
-      try {
-        const userResponse = await fetch(
-          "http://localhost:5000/api/auth/user",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-          }
-        );
+  const checkLogin = async () => {
+    try {
+      const userResponse = await fetch("http://localhost:5000/api/auth/user", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
 
-        const userData = await userResponse.json();
-        console.log(userData);
+      const userData = await userResponse.json();
+
+      if (userData.message) {
+        // if the user cannot be retrieved due to outdated access token
+        // try to refresh it with the refresh token
+        refreshLogin();
+      } else {
         setUser(userData);
-      } catch (error) {
-        alert("Error logging in");
+        setLoading(false);
       }
-    };
+    } catch (error) {
+      alert("Error logging in");
+    }
+  };
 
-    checkLogin();
-  }, []);
+  const refreshLogin = async () => {
+    try {
+      // Refresh the access token using the refresh token
+      const refreshResponse = await fetch(
+        "http://localhost:5000/api/auth/refresh-token",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            refreshToken: localStorage.getItem("refreshToken"),
+          }),
+        }
+      );
+
+      const data = await refreshResponse.json();
+
+      if (data.accessToken) {
+        // Recheck the user
+        localStorage.setItem("accessToken", data.accessToken);
+        checkLogin();
+      } else {
+        // Invalid or empty refresh token error
+        setUser(null);
+        setLoading(false);
+        console.log(data.message);
+      }
+    } catch (error) {
+      alert("Error refreshing your login");
+      setUser(null);
+      setLoading(false);
+    }
+  };
 
   const login = async (formData) => {
     try {
@@ -69,8 +105,12 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("refreshToken");
   };
 
+  useEffect(() => {
+    checkLogin();
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

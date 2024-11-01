@@ -12,7 +12,7 @@
   }
 
   .link-button {
-    @apply text-blue-500 hover:underline w-fit mx-auto mt-1;
+    @apply text-blue-500 hover:underline mt-1;
   }
 
   .nav-button {
@@ -20,10 +20,14 @@
   }
 
   .page-layout {
-    @apply max-w-6xl mx-auto px-2;
+    @apply max-w-6xl mx-auto px-2 min-h-[calc(100vh-104px)];
   }
 
   .login-modal {
     @apply border border-gray-300 w-[350px] p-3 flex flex-col absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] rounded-md;
+  }
+
+  .icon-button {
+    @apply cursor-pointer text-xl w-7 h-7 flex items-center justify-evenly hover:bg-[#F7B733] hover:text-white;
   }
 }

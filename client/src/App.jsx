@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./context/AuthContext";
-import Login from "./pages/Login";
-import Itineraries from "./pages/Itineraries";
+import Login from "./features/auth/pages/Login";
+import Itineraries from "./features/itineraries/pages/Itineraries";
 import Nav from "./layouts/Nav";
+import Footer from "./layouts/Footer";
 
 const PageContext = createContext();
 
@@ -32,6 +33,7 @@ export default function App() {
     <PageContext.Provider value={{ page, setPage }}>
       <Nav />
       {page}
+      <Footer />
     </PageContext.Provider>
   );
 }

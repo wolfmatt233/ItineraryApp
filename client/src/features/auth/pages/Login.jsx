@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { usePage } from "../App";
+import { useAuth } from "../../../context/AuthContext";
+import { usePage } from "../../../App";
 import SignUp from "./SignUp";
 
 export default function Login() {
@@ -49,7 +49,7 @@ export default function Login() {
         Log In
       </button>
 
-      <button className="link-button" onClick={() => setPage(<SignUp />)}>
+      <button className="link-button w-fit mx-auto" onClick={() => setPage(<SignUp />)}>
         No account? Sign up here!
       </button>
     </form>

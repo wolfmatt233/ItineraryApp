@@ -1,6 +1,8 @@
 import { useAuth } from "../context/AuthContext";
 import { usePage } from "../App";
-import Itineraries from "../pages/Itineraries";
+import Itineraries from "../features/itineraries/pages/Itineraries";
+import CreateItinerary from "../features/itineraries/pages/CreateItinerary";
+import User from "../features/auth/pages/User";
 
 export default function Nav() {
   const { user, logout } = useAuth();
@@ -11,15 +13,26 @@ export default function Nav() {
       <nav className="max-w-6xl mx-auto h-14 flex justify-between">
         {user ? (
           <>
-            <button
-              className="nav-button"
-              onClick={() => setPage(<Itineraries />)}
-            >
-              <i className="fa-solid fa-map mr-1"></i> Itineraries
-            </button>
+            <div className="h-full flex">
+              <button
+                className="nav-button"
+                onClick={() => setPage(<Itineraries />)}
+              >
+                <i className="fa-solid fa-map mr-1"></i> Itineraries
+              </button>
+              <button
+                className="nav-button"
+                onClick={() => setPage(<CreateItinerary />)}
+              >
+                <i className="fa-solid fa-plus mr-1"></i> Create Itinerary
+              </button>
+            </div>
             <div className="flex">
-              <button className="nav-button px-4" onClick={() => setPage("")}>
-              <i className="fa-solid fa-user"></i>
+              <button
+                className="nav-button px-4"
+                onClick={() => setPage(<User />)}
+              >
+                <i className="fa-solid fa-user"></i>
               </button>
               <button className="nav-button px-4" onClick={logout}>
                 <i className="fa-solid fa-right-from-bracket"></i>
@@ -27,7 +40,9 @@ export default function Nav() {
             </div>
           </>
         ) : (
-          <p className="text-lg mx-auto flex items-center"><i className="fa-solid fa-map mr-1"></i> Itinerary App</p>
+          <p className="text-lg mx-auto flex items-center select-none">
+            <i className="fa-solid fa-map mr-1"></i> Itinerary App
+          </p>
         )}
       </nav>
     </div>

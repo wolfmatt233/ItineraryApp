@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { usePage } from "../App";
-import Itineraries from "./Itineraries";
+import Itineraries from "./itineraries/pages/Itineraries";
 
 export default function Error({ message }) {
   const { setPage } = usePage();

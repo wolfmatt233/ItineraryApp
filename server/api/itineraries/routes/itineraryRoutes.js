@@ -2,6 +2,7 @@ import { Router } from "express";
 import authMiddleware from "../../auth/middleware/authMiddleware.js";
 import Itinerary from "../models/Itinerary.js";
 import paginate from "../../utils/pagination.js";
+import { hasEmptyInputs } from "../../utils/emptyInputs.js";
 
 const router = Router();
 
@@ -46,7 +47,11 @@ router.get("/:id", authMiddleware, async (req, res) => {
 });
 
 router.post("/", authMiddleware, async (req, res) => {
-  const { title, startDate, endDate } = req.body; //retrieve input vars
+  const { title, startDate, endDate } = req.body;
+
+  if (hasEmptyInputs(req.body)) {
+    return res.status(400).json({ message: "All fields must be completed." });
+  }
 
   try {
     // Create and save the new user
@@ -59,7 +64,7 @@ router.post("/", authMiddleware, async (req, res) => {
 
     await newItinerary.save();
 
-    res.status(201).json({ message: "Itinerary created successfully" });
+    res.status(201).json(newItinerary);
   } catch (error) {
     res.status(500).json({ message: "Error creating itinerary" });
   }
@@ -68,6 +73,10 @@ router.post("/", authMiddleware, async (req, res) => {
 router.patch("/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { title, startDate, endDate, activities } = req.body;
+
+  if (hasEmptyInputs(req.body)) {
+    return res.status(400).json({ message: "All fields must be completed." });
+  }
 
   try {
     // Find itinerary to update
@@ -92,7 +101,7 @@ router.patch("/:id", authMiddleware, async (req, res) => {
     res.status(200).json(updatedItinerary);
   } catch (error) {
     console.log("ERROR", error);
-    res.status(500).json({ message: "Error updating itinerary" });
+    res.status(500).json({ message: "Error updating itinerary", error: error });
   }
 });
 
@@ -109,7 +118,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     if (!itinerary) {
       return res.status(404).json({ message: "Itinerary not found" });
     }
-    
+
     await itinerary.deleteOne();
     res.status(200).json({ message: "Successfully deleted itinerary" });
   } catch (error) {

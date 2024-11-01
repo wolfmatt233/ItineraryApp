@@ -55,27 +55,40 @@ An itenerary website that allows you to create an itenerary on a day by day basi
 
   - Use ISODate for dates
 
-## Features
+## Features / TODO
 
-- Account center
-  - Sign in & Sign out
-  - Sign up
-  - Delete Account
-  - Change password
-  - Change username
-- Itinerary schedule
-  - Choose timeframe (i.e., from 3/14 - 3/21)
-  - Choose an activity for each day by time (i.e., Hiking at Thingvellir National Park at 1:00pm)
-    - Choose a location from the map
-  - Add notes to locations and activities
-  - View completed itinerary
-    - On the map with numbered markers organized by colors based on the day
-    - In a calendar view with the ability to export activities to external calendar applications
-- Itinerary as it occurs
-  - Check off completed activities as they are completed
-  - View map with completed markers grayed out
-- Map to select locations (API needed)
-  - Google maps api?
+- [] Account center
+
+  - [x] Sign in & Sign out
+  - [x] Sign up
+  - [] Delete Account
+  - [] Change username
+
+- [x] Create Itinerary
+- [] Create locations/activities
+
+- [] Read Itinerary
+
+  - [x] Display all itineraries to select from
+  - [] View Individual itineraries
+    - [x] View Title and dates
+    - [] View locations/activities
+
+- [] Update Itinerary
+  - [x] Update Title and dates
+  - [] Update locations/activities
+    - [] Mark as complete
+
+- [x] Delete Itinerary
+- [] Delete locations/activities
+
+- Interactive Components
+
+- [] Choose a location from the map (API)
+- [] View up to date itinerary on the map with numbered markers organized by colors based on the day
+  - [] Completed activities grayed out
+- [] View activities in a calendar view
+  - [] Export activities to external calendar applications
 
 ## Possible Features (uncertain)
 
@@ -85,8 +98,3 @@ An itenerary website that allows you to create an itenerary on a day by day basi
     - 2nd: Then zoom in to the first location, show its name, activity, and picture
     - 3rd: Fly across the map to each location and do the same.
     - 4th: Finish title
-
-## TODO
-- Everything front end
-- Server/API
-  - Auth Read, Update, and Delete operations

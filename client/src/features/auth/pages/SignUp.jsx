@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { usePage } from "../App";
-import { useAuth } from "../context/AuthContext";
+import { usePage } from "../../../App";
+import { useAuth } from "../../../context/AuthContext";
 import Login from "./Login";
 
 export default function SignUp() {
-  const { user, login } = useAuth();
+  const { login } = useAuth();
   const { setPage } = usePage();
   const [formData, setFormData] = useState({
     email: "",
@@ -20,22 +20,28 @@ export default function SignUp() {
     }));
   };
 
-  const signUp = async () => {
-    const signUp = await fetch("http://localhost:5000/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+  const signUp = async (e) => {
+    e.preventDefault();
 
-    const data = await signUp.json();
-    alert(data.message);
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    if (signUp.response === 201) {
-      login(formData);
-    } else {
-      alert(data.message);
+      const data = await response.json();
+
+      if (response.status === 201) {
+        login(formData);
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Registration failed");
     }
   };
 
@@ -66,12 +72,12 @@ export default function SignUp() {
       <button
         type="submit"
         className="basic-button basic-input"
-        onSubmit={signUp}
+        onClick={signUp}
       >
         Sign Up
       </button>
 
-      <button className="link-button" onClick={() => setPage(<Login />)}>
+      <button className="link-button w-fit mx-auto" onClick={() => setPage(<Login />)}>
         Already have an account? Log in here!
       </button>
     </form>

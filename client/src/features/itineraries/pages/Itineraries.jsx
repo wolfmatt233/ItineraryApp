@@ -38,17 +38,17 @@ export default function Itineraries() {
         <Error message={error} />
       ) : (
         <>
-          <div className="py-2 border-b mb-3 flex justify-between items-end">
+          <div className="page-title">
             <p className="text-lg">Your Itineraries</p>
             <i
-              className="fa-solid fa-pen-to-square icon-button"
+              className={`fa-solid fa-${edit ? "xmark" : "pen-to-square"} icon-button`}
               onClick={() => setEdit((prev) => !prev)}
             ></i>
           </div>
           {itineraries.map((item, idx) => (
             <div
               key={idx}
-              className="flex max-sm:-mx-2 max-sm:w-screen border-b"
+              className="flex max-sm:-mx-4 max-sm:w-screen border-b"
             >
               <button
                 className="bg-[#4ABDAC] text-white px-2 flex w-full items-center justify-between hover:bg-[#f7b733]"

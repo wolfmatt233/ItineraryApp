@@ -10,7 +10,7 @@ export default function Nav() {
 
   return (
     <div className="bg-[#4ABDAC] text-white">
-      <nav className="max-w-6xl mx-auto h-14 flex justify-between">
+      <nav className="max-w-6xl mx-auto h-14 flex justify-between px-4 max-sm:-mx-4 max-sm:px-2">
         {user ? (
           <>
             <div className="h-full flex">

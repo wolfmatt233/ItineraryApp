@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import Itineraries from "./Itineraries";
 import EditInfo from "../sub-components/EditInfo";
 import { usePage } from "../../../App";
+import AddActivity from "../sub-components/AddActivity";
 
 export default function Itinerary({ id }) {
   const { setPage } = usePage();
   const [itinerary, setItinerary] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [addActivity, setAddActivity] = useState(false);
 
   const getItinerary = async () => {
     try {
@@ -22,6 +25,7 @@ export default function Itinerary({ id }) {
 
       if (response.status === 200) {
         setItinerary(data);
+        setLoading(false);
       } else {
         setPage(<Itineraries />);
         alert("No itinerary found");
@@ -35,6 +39,14 @@ export default function Itinerary({ id }) {
   useEffect(() => {
     getItinerary();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center page-layout">
+        <i className="fas fa-circle-notch fa-spin text-5xl text-black"></i>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -60,6 +72,23 @@ export default function Itinerary({ id }) {
                 {item.completed === false ? <p>Incomplete</p> : <p>Complete</p>}
               </div>
             ))}
+          {addActivity ? (
+            <AddActivity
+              id={id}
+              setAddActivity={setAddActivity}
+              getItinerary={getItinerary}
+              setItinerary={setItinerary}
+              itinerary={itinerary}
+            />
+          ) : (
+            <button
+              className="basic-button"
+              onClick={() => setAddActivity((prev) => !prev)}
+            >
+              Add an activity
+              <i className="fa-solid fa-plus ml-1"></i>
+            </button>
+          )}
         </div>
       )}
     </>

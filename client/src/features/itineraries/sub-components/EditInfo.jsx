@@ -50,7 +50,7 @@ export default function EditInfo({
 
   return (
     <>
-      <div className="py-2 border-b mb-3 flex justify-between items-end">
+      <div className="page-title items-center">
         {edit ? (
           <>
             <div className="w-full mr-2">
@@ -59,13 +59,13 @@ export default function EditInfo({
                 type="text"
                 name="title"
                 value={itinerary.title}
-                className="text-lg w-full mr-2"
+                className="basic-input w-full mr-2"
                 onChange={handleChange}
               />
             </div>
-            <div className="flex">
+            <div className="flex mt-4">
               <i
-                className="fa-solid fa-xmark icon-button"
+                className="fa-solid fa-xmark icon-button mr-1"
                 onClick={cancelEdit}
               ></i>
               <i

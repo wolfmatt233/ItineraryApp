@@ -44,42 +44,47 @@ export default function SignUp() {
       alert("Registration failed");
     }
   };
-
+  
   return (
-    <form className="login-modal">
-      <p className="text-center text-lg">Sign Up</p>
-      <label htmlFor="name">Username</label>
-      <input
-        type="text"
-        name="username"
-        className="basic-input"
-        onChange={handleChange}
-      />
-      <label htmlFor="email">Email</label>
-      <input
-        type="email"
-        name="email"
-        className="basic-input"
-        onChange={handleChange}
-      />
-      <label htmlFor="password">Password</label>
-      <input
-        type="password"
-        name="password"
-        className="basic-input"
-        onChange={handleChange}
-      />
-      <button
-        type="submit"
-        className="basic-button basic-input"
-        onClick={signUp}
-      >
-        Sign Up
-      </button>
+    <div className="page-layout">
+      <form className="login-modal">
+        <p className="text-center text-lg">Sign Up</p>
+        <label htmlFor="name">Username</label>
+        <input
+          type="text"
+          name="username"
+          className="basic-input"
+          onChange={handleChange}
+        />
+        <label htmlFor="email">Email</label>
+        <input
+          type="email"
+          name="email"
+          className="basic-input"
+          onChange={handleChange}
+        />
+        <label htmlFor="password">Password</label>
+        <input
+          type="password"
+          name="password"
+          className="basic-input"
+          onChange={handleChange}
+        />
+        <button
+          type="submit"
+          className="basic-button basic-input"
+          onClick={signUp}
+        >
+          Sign Up
+        </button>
 
-      <button className="link-button w-fit mx-auto" onClick={() => setPage(<Login />)}>
-        Already have an account? Log in here!
-      </button>
-    </form>
+        <button
+          className="link-button w-fit mx-auto"
+          onClick={() => setPage(<Login />)}
+        >
+          Already have an account? Log in here!
+        </button>
+      </form>
+    </div>
   );
 }

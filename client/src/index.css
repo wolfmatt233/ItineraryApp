@@ -20,7 +20,7 @@
   }
 
   .page-layout {
-    @apply max-w-6xl mx-auto px-2 min-h-[calc(100vh-104px)];
+    @apply max-w-6xl mx-auto px-4 min-h-[calc(100vh-104px)];
   }
 
   .login-modal {
@@ -28,6 +28,10 @@
   }
 
   .icon-button {
-    @apply cursor-pointer text-xl w-7 h-7 flex items-center justify-evenly hover:bg-[#F7B733] hover:text-white;
+    @apply cursor-pointer text-xl w-7 h-7 flex items-center justify-evenly hover:bg-[#F7B733] hover:text-white rounded-md;
+  }
+
+  .page-title {
+    @apply max-sm:-mx-4 max-sm:px-2 py-2 border-b mb-3 flex justify-between items-end;
   }
 }

@@ -72,7 +72,7 @@ router.post("/", authMiddleware, async (req, res) => {
 
 router.patch("/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
-  const { title, startDate, endDate, activities } = req.body;
+  const { title, startDate, endDate, activities, notes, completed } = req.body;
 
   if (hasEmptyInputs(req.body)) {
     return res.status(400).json({ message: "All fields must be completed." });
@@ -94,6 +94,8 @@ router.patch("/:id", authMiddleware, async (req, res) => {
     itinerary.startDate = new Date(startDate) || itinerary.startDate;
     itinerary.endDate = new Date(endDate) || itinerary.endDate;
     itinerary.activities = activities || itinerary.activities;
+    itinerary.notes = notes || itinerary.notes;
+    itinerary.completed = completed || itinerary.compeleted;
     itinerary.updatedAt = new Date();
 
     const updatedItinerary = await itinerary.save();

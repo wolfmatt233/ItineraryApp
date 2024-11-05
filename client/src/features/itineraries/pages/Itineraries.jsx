@@ -4,27 +4,35 @@ import Itinerary from "./Itinerary";
 import { formatDate } from "../functions/formatDate";
 import Error from "../../Error";
 import DeleteModal from "../sub-components/DeleteModal";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function Itineraries() {
   const { setPage } = usePage();
+  const { refreshLogin } = useAuth();
   const [itineraries, setItineraries] = useState([]);
   const [error, setError] = useState("");
   const [edit, setEdit] = useState(false);
   const [modal, setModal] = useState(false);
 
   const getItineraries = async () => {
-    const response = await fetch("http://localhost:5000/api/itineraries", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    });
+    try {
+      const response = await fetch("http://localhost:5000/api/itineraries", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!data.items) {
-      setError(data.message);
-    } else {
-      setItineraries(data.items);
+      if (response.status === 403) {
+        refreshLogin();
+      } else if (!data.items) {
+        setError(data.message);
+      } else {
+        setItineraries(data.items);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -41,7 +49,9 @@ export default function Itineraries() {
           <div className="page-title">
             <p className="text-lg">Your Itineraries</p>
             <i
-              className={`fa-solid fa-${edit ? "xmark" : "pen-to-square"} icon-button`}
+              className={`fa-solid fa-${
+                edit ? "xmark" : "pen-to-square"
+              } icon-button`}
               onClick={() => setEdit((prev) => !prev)}
             ></i>
           </div>

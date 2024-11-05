@@ -1,24 +1,29 @@
 import { useEffect, useState } from "react";
+import { removeTime } from "../functions/formatDate";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function AddActivity({
   id,
-  setAddActivity,
-  itinerary,
-  getItinerary,
+  setLocation,
+  location,
   setItinerary,
+  itinerary,
+  setShowMap,
 }) {
+  const { refreshLogin } = useAuth();
   const [newActivity, setNewActivity] = useState({
     date: "",
     time: "",
     activity: "",
     location: {
-      name: "",
+      name: location.name.split(",")[0],
       coordinates: {
-        lat: "",
-        lon: "",
+        lat: location.position[0],
+        lon: location.position[1],
       },
     },
     notes: "",
+    completed: false,
   });
 
   const handleChange = (e) => {
@@ -30,17 +35,29 @@ export default function AddActivity({
     }));
   };
 
-  const handleSave = async () => {
+  const handleClose = (e) => {
+    setLocation(false);
+    setShowMap(true);
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+
+    const updatedTime = { ...newActivity, date: `${newActivity.date}T${newActivity.time}` };
+
     const updatedItinerary = {
       ...itinerary,
-      activities: [...itinerary.activities, newActivity],
+      activities: [...itinerary.activities, updatedTime],
     };
+
+    console.log(updatedItinerary);
+
     try {
       const response = await fetch(
         `http://localhost:5000/api/itineraries/${id}`,
         {
-          method: "POST",
-          body: { itinerary },
+          method: "PATCH",
+          body: JSON.stringify(updatedItinerary),
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             "Content-Type": "application/json",
@@ -52,23 +69,28 @@ export default function AddActivity({
 
       if (response.ok) {
         setItinerary(data);
+        handleClose();
+      } else {
+        refreshLogin();
+        handleSave();
       }
     } catch (error) {
-      //
+      console.log(error);
       alert("Activity creation failed.");
     }
   };
 
   return (
-    <form className="flex flex-col w-1/2 mx-auto">
-      <p>Select location from map</p>
-      <p>Location gives name & coordinates</p>
-
-      <p>Activity Form</p>
+    <form className="flex flex-col">
+      <p>
+        New Location Selected: <b>{newActivity.location.name}</b>
+      </p>
       <label htmlFor="date">Date</label>
       <input
         type="date"
         name="date"
+        min={removeTime(itinerary.startDate)}
+        max={removeTime(itinerary.endDate)}
         className="basic-input"
         onChange={handleChange}
       />
@@ -80,7 +102,12 @@ export default function AddActivity({
         onChange={handleChange}
       />
       <label htmlFor="activity">Activity</label>
-      <input type="text" className="basic-input" onChange={handleChange} />
+      <input
+        type="text"
+        name="activity"
+        className="basic-input"
+        onChange={handleChange}
+      />
       <label htmlFor="notes">Notes</label>
       <textarea
         name="notes"
@@ -91,11 +118,12 @@ export default function AddActivity({
       <div className="flex items-center">
         <button
           className="h-10 border border-gray-300 hover:bg-gray-200 mr-2 w-1/2"
-          onClick={() => setAddActivity(false)}
+          onClick={handleClose}
         >
           Cancel
         </button>
         <button
+          type="submit"
           className="h-10 border text-white bg-[#4ABDAC] hover:bg-[#F7B733] mr-2 w-1/2"
           onClick={handleSave}
         >

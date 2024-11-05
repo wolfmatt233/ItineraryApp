@@ -3,12 +3,19 @@ import Itineraries from "./Itineraries";
 import EditInfo from "../sub-components/EditInfo";
 import { usePage } from "../../../App";
 import AddActivity from "../sub-components/AddActivity";
+import ActivitiesMap from "../sub-components/ActivitiesMap";
+import SelectMap from "../sub-components/SelectMap";
+import { convertDate } from "../functions/formatDate";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function Itinerary({ id }) {
   const { setPage } = usePage();
+  const { refreshLogin } = useAuth();
   const [itinerary, setItinerary] = useState({});
   const [loading, setLoading] = useState(true);
-  const [addActivity, setAddActivity] = useState(false);
+  const [location, setLocation] = useState(false);
+  const [showMap, setShowMap] = useState(true);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   const getItinerary = async () => {
     try {
@@ -23,12 +30,15 @@ export default function Itinerary({ id }) {
 
       const data = await response.json();
 
-      if (response.status === 200) {
+      if (response.ok) {
         setItinerary(data);
         setLoading(false);
-      } else {
+      } else if (response.status === 404) {
         setPage(<Itineraries />);
-        alert("No itinerary found");
+        console.log("No itinerary found");
+      } else {
+        refreshLogin();
+        getItinerary();
       }
     } catch (error) {
       setPage(<Itineraries />);
@@ -39,6 +49,17 @@ export default function Itinerary({ id }) {
   useEffect(() => {
     getItinerary();
   }, []);
+
+  useEffect(() => {
+    if (!showMap && location) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  return () => {
+    document.body.style.overflow = 'auto';
+  };
+  }, [showMap])
 
   if (loading) {
     return (
@@ -58,8 +79,36 @@ export default function Itinerary({ id }) {
             setItinerary={setItinerary}
             itinerary={itinerary}
           />
-          <p>Activities</p>
-          {/* Show calendar with activites on days */}
+          {!location && (
+            <button
+              className="basic-button"
+              onClick={() => setShowMap((prev) => !prev)}
+            >
+              {showMap ? "Add an Activity/Location" : "Cancel"}
+            </button>
+          )}
+
+          {showMap ? (
+            <ActivitiesMap itinerary={itinerary} />
+          ) : !location ? (
+            <SelectMap
+              setLocation={setLocation}
+              itinerary={itinerary}
+              setShowMap={setShowMap}
+            />
+          ) : (
+            <AddActivity
+              id={id}
+              setLocation={setLocation}
+              location={location}
+              setItinerary={setItinerary}
+              itinerary={itinerary}
+              setShowMap={setShowMap}
+            />
+          )}
+
+          {/* TODO: Show calendar with activites on days */}
+
           {itinerary.activities &&
             itinerary.activities.map((item, idx) => (
               <div key={item._id}>
@@ -67,28 +116,14 @@ export default function Itinerary({ id }) {
                 <p>
                   {item.activity} @ {item.location.name}
                 </p>
-                <p>Time: {item.time}</p>
+                <p>
+                  {" "}
+                  {convertDate(item.date)} @ {item.time}
+                </p>
                 {item.notes && <p>Notes: {item.notes}</p>}
                 {item.completed === false ? <p>Incomplete</p> : <p>Complete</p>}
               </div>
             ))}
-          {addActivity ? (
-            <AddActivity
-              id={id}
-              setAddActivity={setAddActivity}
-              getItinerary={getItinerary}
-              setItinerary={setItinerary}
-              itinerary={itinerary}
-            />
-          ) : (
-            <button
-              className="basic-button"
-              onClick={() => setAddActivity((prev) => !prev)}
-            >
-              Add an activity
-              <i className="fa-solid fa-plus ml-1"></i>
-            </button>
-          )}
         </div>
       )}
     </>

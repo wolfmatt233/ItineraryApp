@@ -34,4 +34,8 @@
   .page-title {
     @apply max-sm:-mx-4 max-sm:px-2 py-2 border-b mb-3 flex justify-between items-end;
   }
+
+  .map-marker {
+    @apply bg-[#007bff]  rounded-full text-white font-bold flex justify-center items-center;
+  }
 }

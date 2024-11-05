@@ -53,13 +53,13 @@ export const AuthProvider = ({ children }) => {
         checkLogin();
       } else {
         // Invalid or empty refresh token error
-        setUser(null);
+        logout();
         setLoading(false);
-        console.log(data.message);
+        alert(data.message);
       }
     } catch (error) {
       alert("Error refreshing your login");
-      setUser(null);
+      logout();
       setLoading(false);
     }
   };
@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, refreshLogin }}>
       {children}
     </AuthContext.Provider>
   );

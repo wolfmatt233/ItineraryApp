@@ -10,7 +10,7 @@ import L from "leaflet";
 import { convertDate } from "../functions/formatDate";
 import { getFirstActivity } from "../functions/getFirstActivity";
 
-export default function ActivitiesMap({ itinerary }) {
+export default function ActivitiesMap({ itinerary, setModal }) {
   const firstCoords = getFirstActivity(itinerary.activities);
   const lineMap = itinerary.activities
     .sort((a, b) => new Date(a.date) - new Date(b.date))
@@ -59,6 +59,12 @@ export default function ActivitiesMap({ itinerary }) {
                 <p>
                   Coordinates (Lat, Lon): {coords.lat}, {coords.lon}
                 </p>
+                <button
+                  className="link-button"
+                  onClick={() => setModal(activity._id)}
+                >
+                  Delete
+                </button>
               </Popup>
             </Marker>
           );

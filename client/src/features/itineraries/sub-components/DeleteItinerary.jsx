@@ -1,4 +1,4 @@
-export default function DeleteModal({ id, setModal, setItineraries }) {
+export default function DeleteItinerary({ id, setModal, setItineraries }) {
   const handleDelete = async (e) => {
     e.preventDefault();
 

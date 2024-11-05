@@ -3,7 +3,7 @@ import { usePage } from "../../../App";
 import Itinerary from "./Itinerary";
 import { formatDate } from "../functions/formatDate";
 import Error from "../../Error";
-import DeleteModal from "../sub-components/DeleteModal";
+import DeleteItinerary from "../sub-components/DeleteItinerary";
 import { useAuth } from "../../../context/AuthContext";
 
 export default function Itineraries() {
@@ -83,7 +83,7 @@ export default function Itineraries() {
                 ></i>
               )}
               {modal == item._id && (
-                <DeleteModal
+                <DeleteItinerary
                   id={item._id}
                   setModal={setModal}
                   setItineraries={setItineraries}

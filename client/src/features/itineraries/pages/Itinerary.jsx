@@ -7,6 +7,7 @@ import ActivitiesMap from "../sub-components/ActivitiesMap";
 import SelectMap from "../sub-components/SelectMap";
 import { convertDate } from "../functions/formatDate";
 import { useAuth } from "../../../context/AuthContext";
+import DeleteActivity from "../sub-components/DeleteActivity";
 
 export default function Itinerary({ id }) {
   const { setPage } = usePage();
@@ -16,6 +17,7 @@ export default function Itinerary({ id }) {
   const [location, setLocation] = useState(false);
   const [showMap, setShowMap] = useState(true);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [modal, setModal] = useState(false);
 
   const getItinerary = async () => {
     try {
@@ -51,15 +53,15 @@ export default function Itinerary({ id }) {
   }, []);
 
   useEffect(() => {
-    if (!showMap && location) {
+    if ((!showMap && location) || modal) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
     }
-  return () => {
-    document.body.style.overflow = 'auto';
-  };
-  }, [showMap])
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [showMap, modal]);
 
   if (loading) {
     return (
@@ -89,7 +91,7 @@ export default function Itinerary({ id }) {
           )}
 
           {showMap ? (
-            <ActivitiesMap itinerary={itinerary} />
+            <ActivitiesMap itinerary={itinerary} setModal={setModal} />
           ) : !location ? (
             <SelectMap
               setLocation={setLocation}
@@ -125,6 +127,14 @@ export default function Itinerary({ id }) {
               </div>
             ))}
         </div>
+      )}
+      {modal && (
+        <DeleteActivity
+          modal={modal}
+          setModal={setModal}
+          setItinerary={setItinerary}
+          itinerary={itinerary}
+        />
       )}
     </>
   );

@@ -98,7 +98,7 @@ export default function SelectMap({ setLocation, itinerary, setShowMap }) {
                   Coordinates: {marker.position[0]}, {marker.position[1]}
                 </p>
                 <button
-                  className="link-button text-center"
+                  className="link-button"
                   onClick={() => setLocation(marker)}
                 >
                   Select Location

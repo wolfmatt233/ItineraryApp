@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { formatDate, removeTime } from "../functions/formatDate";
+import { formatDate, removeTime } from "../../functions/formatDate";
 
 export default function EditInfo({
   itinerary,
@@ -85,7 +85,7 @@ export default function EditInfo({
         )}
       </div>
       <div className="flex flex-wrap">
-        <div className="flex flex-col mr-2">
+        <div className="flex flex-col mr-2 mb-2">
           <p>
             Start Date{" "}
             {edit && <span className="text-sm text-gray-500">(editing)</span>}

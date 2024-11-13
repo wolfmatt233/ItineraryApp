@@ -38,4 +38,8 @@
   .map-marker {
     @apply bg-[#007bff]  rounded-full text-white font-bold flex justify-center items-center;
   }
+
+  .site-green {
+    @apply bg-[#4ABDAC];
+  }
 }

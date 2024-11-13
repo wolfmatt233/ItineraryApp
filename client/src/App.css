@@ -4,3 +4,11 @@ body {
   color: #333333;
   background-color: #f3f4f6;
 }
+
+.hide-date {
+  display: none;
+}
+
+.hide-date::-webkit-calendar-picker-indicator {
+  display: none;
+}

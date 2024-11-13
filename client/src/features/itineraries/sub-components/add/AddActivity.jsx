@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { removeTime } from "../functions/formatDate";
-import { useAuth } from "../../../context/AuthContext";
+import { removeTime } from "../../functions/formatDate";
+import { useAuth } from "../../../../context/AuthContext";
 
 export default function AddActivity({
   id,
@@ -43,14 +43,15 @@ export default function AddActivity({
   const handleSave = async (e) => {
     e.preventDefault();
 
-    const updatedTime = { ...newActivity, date: `${newActivity.date}T${newActivity.time}` };
+    const updatedTime = {
+      ...newActivity,
+      date: `${newActivity.date}T${newActivity.time}`,
+    };
 
     const updatedItinerary = {
       ...itinerary,
       activities: [...itinerary.activities, updatedTime],
     };
-
-    console.log(updatedItinerary);
 
     try {
       const response = await fetch(

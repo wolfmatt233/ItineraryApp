@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import Itineraries from "./Itineraries";
 import EditInfo from "../sub-components/edit/EditInfo";
 import { usePage } from "../../../App";
 import AddActivity from "../sub-components/add/AddActivity";
-import ActivitiesMap from "../sub-components/ActivitiesMap";
+import ActivitiesMap from "../sub-components/ActivityMap";
 import SelectMap from "../sub-components/add/SelectMap";
 import { useAuth } from "../../../context/AuthContext";
-import DeleteActivity from "../sub-components/delete/DeleteActivity";
 import Calendar from "../sub-components/Calendar";
+import EditActivity from "../sub-components/edit/EditActivity";
+
+const ItineraryContext = createContext();
+export const useItinerary = () => useContext(ItineraryContext);
 
 export default function Itinerary({ id }) {
   const { setPage } = usePage();
@@ -16,7 +19,7 @@ export default function Itinerary({ id }) {
   const [loading, setLoading] = useState(true);
   const [location, setLocation] = useState(false);
   const [showMap, setShowMap] = useState(true);
-  const [modal, setModal] = useState(false);
+  const [activityId, setActivityId] = useState(false);
 
   const getItinerary = async () => {
     try {
@@ -52,7 +55,7 @@ export default function Itinerary({ id }) {
   }, []);
 
   useEffect(() => {
-    if ((!showMap && location) || (!showMap && !location) || modal) {
+    if ((!showMap && location) || (!showMap && !location)) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -60,7 +63,7 @@ export default function Itinerary({ id }) {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [showMap, modal]);
+  }, [showMap]);
 
   if (loading) {
     return (
@@ -71,53 +74,30 @@ export default function Itinerary({ id }) {
   }
 
   return (
-    <>
+    <ItineraryContext.Provider
+      value={{ id, itinerary, setItinerary, setShowMap }}
+    >
       {itinerary && (
         <div className="page-layout flex flex-col">
-          <EditInfo
-            id={id}
-            getItinerary={getItinerary}
-            setItinerary={setItinerary}
-            itinerary={itinerary}
-          />
+          <EditInfo getItinerary={getItinerary} />
 
-          {showMap ? (
-            // Automatically shown via showMap
-            <ActivitiesMap
-              itinerary={itinerary}
-              setShowMap={setShowMap}
-              setModal={setModal}
+          {/* Show Activities Map, Select Location Map, Add Activity Form, or Edit Activity Form */}
+          {showMap && !location && !activityId ? (
+            <ActivitiesMap setActivityId={setActivityId} />
+          ) : !location && !showMap ? (
+            <SelectMap setLocation={setLocation} />
+          ) : !showMap && location ? (
+            <AddActivity setLocation={setLocation} location={location} />
+          ) : activityId && showMap && !location ? (
+            <EditActivity
+              activityId={activityId}
+              setActivityId={setActivityId}
             />
-          ) : !location ? (
-            // Shown when showMap is false & no selected location
-            <SelectMap
-              setLocation={setLocation}
-              itinerary={itinerary}
-              setShowMap={setShowMap}
-            />
-          ) : (
-            // Shown when no map & a selected location
-            <AddActivity
-              id={id}
-              setLocation={setLocation}
-              location={location}
-              setItinerary={setItinerary}
-              itinerary={itinerary}
-              setShowMap={setShowMap}
-            />
-          )}
+          ) : null}
 
           <Calendar itinerary={itinerary} />
         </div>
       )}
-      {modal && (
-        <DeleteActivity
-          modal={modal}
-          setModal={setModal}
-          setItinerary={setItinerary}
-          itinerary={itinerary}
-        />
-      )}
-    </>
+    </ItineraryContext.Provider>
   );
 }

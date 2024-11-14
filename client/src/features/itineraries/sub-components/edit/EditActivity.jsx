@@ -1,52 +1,54 @@
-import { useState } from "react";
-import { removeTime } from "../../functions/formatDate";
-import { useAuth } from "../../../../context/AuthContext";
+import { useEffect, useState } from "react";
+import { getTime, removeTime } from "../../functions/formatDate";
 import { useItinerary } from "../../pages/Itinerary";
 
-export default function AddActivity({ setLocation, location }) {
+export default function EditActivity({ activityId, setActivityId }) {
   const { id, itinerary, setItinerary, setShowMap } = useItinerary();
-  const [newActivity, setNewActivity] = useState({
-    date: "",
-    time: "",
-    activity: "",
-    location: {
-      name: location.name.split(",")[0],
-      coordinates: {
-        lat: location.position[0],
-        lon: location.position[1],
-      },
-    },
-    notes: "",
-    completed: false,
+  const [activity, setActivity] = useState(
+    itinerary.activities.filter((activity) => activity._id === activityId)[0]
+  );
+  const [datetime, setDatetime] = useState({
+    date: removeTime(activity.datetime),
+    time: activity.datetime.split("T")[1].replace(/:00$/, ""),
   });
 
   const handleChange = (e) => {
     let { name, value } = e.target;
 
-    setNewActivity((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setActivity((prevData) => {
+      if (name === "locationName") {
+        return {
+          ...prevData,
+          location: {
+            ...prevData.location,
+            name: value,
+          },
+        };
+      }
+
+      return {
+        ...prevData,
+        [name]: value,
+      };
+    });
   };
 
-  const handleClose = (e) => {
-    setLocation(false);
-    setShowMap(true);
-  };
-
-  const handleSave = async (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
 
-    const { date, time, ...restOfActivity } = newActivity;
+    const { ...restOfActivity } = activity;
 
     const activityWithTime = {
       ...restOfActivity,
-      datetime: `${date}T${time}:00`,
+      datetime: `${datetime.date}T${datetime.time}:00`,
     };
 
+    // Replace old activity with new one
     const updatedItinerary = {
       ...itinerary,
-      activities: [...itinerary.activities, activityWithTime],
+      activities: itinerary.activities.map((activity) =>
+        activity._id === activityId ? activityWithTime : activity
+      ),
     };
 
     try {
@@ -77,11 +79,26 @@ export default function AddActivity({ setLocation, location }) {
     }
   };
 
+  const handleClose = (e) => {
+    setActivityId(false);
+    setShowMap(true);
+  };
+
+  useEffect(() => {
+    console.log(datetime.time);
+  }, []);
+
   return (
     <form className="flex flex-col">
-      <p>
-        New Location Selected: <b>{newActivity.location.name}</b>
-      </p>
+      <p className="text-lg font-semibold">Edit Activity</p>
+      <label htmlFor="locationName">Location Name</label>
+      <input
+        type="text"
+        name="locationName"
+        className="basic-input"
+        onChange={handleChange}
+        value={activity.location.name}
+      />
       <label htmlFor="date">Date</label>
       <input
         type="date"
@@ -89,14 +106,30 @@ export default function AddActivity({ setLocation, location }) {
         min={removeTime(itinerary.startDate)}
         max={removeTime(itinerary.endDate)}
         className="basic-input"
-        onChange={handleChange}
+        onChange={(e) =>
+          setDatetime((prev) => {
+            return {
+              ...prev,
+              date: e.target.value,
+            };
+          })
+        }
+        value={datetime.date}
       />
       <label htmlFor="time">Time</label>
       <input
         type="time"
         name="time"
         className="basic-input"
-        onChange={handleChange}
+        onChange={(e) =>
+          setDatetime((prev) => {
+            return {
+              ...prev,
+              time: e.target.value,
+            };
+          })
+        }
+        value={datetime.time}
       />
       <label htmlFor="activity">Activity</label>
       <input
@@ -104,6 +137,7 @@ export default function AddActivity({ setLocation, location }) {
         name="activity"
         className="basic-input"
         onChange={handleChange}
+        value={activity.activity}
       />
       <label htmlFor="notes">Notes</label>
       <textarea
@@ -111,6 +145,7 @@ export default function AddActivity({ setLocation, location }) {
         rows={4}
         className="basic-input"
         onChange={handleChange}
+        value={activity.notes}
       ></textarea>
       <div className="flex items-center">
         <button
@@ -122,9 +157,9 @@ export default function AddActivity({ setLocation, location }) {
         <button
           type="submit"
           className="h-10 border text-white bg-[#4ABDAC] hover:bg-[#F7B733] mr-2 w-1/2"
-          onClick={handleSave}
+          onClick={handleUpdate}
         >
-          Add Activity
+          Update Activity
         </button>
       </div>
     </form>

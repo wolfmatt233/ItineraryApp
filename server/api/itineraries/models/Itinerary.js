@@ -7,8 +7,7 @@ const itinerarySchema = new mongoose.Schema({
   endDate: { type: Date, required: true },
   activities: [
     {
-      date: { type: Date, required: true },
-      time: { type: String, required: true },
+      datetime: { type: String, required: true },
       activity: { type: String, required: true },
       location: {
         name: { type: String, required: true },

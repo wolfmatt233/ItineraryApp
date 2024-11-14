@@ -9,20 +9,24 @@ import {
 } from "react-leaflet";
 import { getLastActivity } from "../../functions/getFirstActivity";
 import LocationSearch from "./LocationSearch";
+import { useItinerary } from "../../pages/Itinerary";
+import MarkerClusterGroup from "react-leaflet-markercluster";
 
-export default function SelectMap({ setLocation, itinerary, setShowMap }) {
+export default function SelectMap({ setLocation }) {
+  const { itinerary, setShowMap } = useItinerary();
   const [markers, setMarkers] = useState([]);
-  const [toggleLocations, setToggleLocations] = useState(true);
   const [mapCenter, setMapCenter] = useState(
     getLastActivity(itinerary.activities)
   );
   const markerRefs = useRef([]);
+  const clusterGroupRef = useRef();
 
   const markerMap = markers.map((marker, idx) => (
     <Marker
       key={idx}
       position={marker.position}
       ref={(el) => (markerRefs.current[idx] = el)}
+      id={marker.id}
     >
       <Popup>
         <p>{marker.name}</p>
@@ -65,6 +69,8 @@ export default function SelectMap({ setLocation, itinerary, setShowMap }) {
           markerRefs={markerRefs}
           setMarkers={setMarkers}
           setMapCenter={setMapCenter}
+          mapCenter={mapCenter}
+          clusterGroupRef={clusterGroupRef}
         />
         <MapContainer
           className="h-screen w-full absolute max-sm:top-0 max-sm:translate-y-0 top-1/2 translate-y-[-50%]"
@@ -77,7 +83,9 @@ export default function SelectMap({ setLocation, itinerary, setShowMap }) {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
           />
-          {markerMap}
+          <MarkerClusterGroup ref={clusterGroupRef}>
+            {markerMap}
+          </MarkerClusterGroup>
         </MapContainer>
       </div>
     </div>

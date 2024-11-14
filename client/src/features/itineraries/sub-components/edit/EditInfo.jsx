@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
 import { formatDate, removeTime } from "../../functions/formatDate";
+import { useItinerary } from "../../pages/Itinerary";
 
-export default function EditInfo({
-  itinerary,
-  getItinerary,
-  setItinerary,
-  id,
-}) {
+export default function EditInfo({ getItinerary }) {
+  const { id, itinerary, setItinerary } = useItinerary();
   const [edit, setEdit] = useState(false);
 
   const handleChange = (e) => {

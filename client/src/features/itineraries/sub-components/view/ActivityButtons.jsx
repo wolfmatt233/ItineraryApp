@@ -1,12 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { removeTime } from "../../functions/formatDate";
+import { useItinerary } from "../../pages/Itinerary";
+import { useFilter } from "../ActivityMap";
 
-export default function ActivitiesButtons({
-  itinerary,
-  setActivities,
-  setShowMap,
-}) {
-  const [filterDate, setFilterDate] = useState("");
+export default function ActivityButtons({ setActivities }) {
+  const { itinerary, setShowMap } = useItinerary();
+  const { filterDate, setFilterDate, clearFilter } = useFilter();
   const dateInputRef = useRef(null);
 
   const handleDivClick = () => {
@@ -14,21 +13,6 @@ export default function ActivitiesButtons({
       dateInputRef.current.showPicker();
     }
   };
-
-  const clearFilter = () => {
-    setActivities(itinerary.activities);
-    setFilterDate("");
-  };
-
-  useEffect(() => {
-    if (filterDate.length > 0) {
-      const newActivities = itinerary.activities.filter((activity) => {
-        return removeTime(new Date(activity.date)) === filterDate;
-      });
-
-      setActivities(newActivities);
-    }
-  }, [filterDate]);
 
   return (
     <>

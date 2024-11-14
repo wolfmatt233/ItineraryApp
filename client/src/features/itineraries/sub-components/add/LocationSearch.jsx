@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { clickMarker } from "../../functions/mapFunctions";
 
 export default function LocationSearch({
   markerRefs,
   setMarkers,
   setMapCenter,
+  mapCenter,
+  clusterGroupRef,
 }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -28,7 +31,9 @@ export default function LocationSearch({
 
     if (results && results.length > 0) {
       const firstResult = results[0];
+
       const newMarkers = results.map((place) => ({
+        id: place.place_id,
         name: place.display_name,
         position: [parseFloat(place.lat), parseFloat(place.lon)],
       }));
@@ -36,23 +41,9 @@ export default function LocationSearch({
       setMarkers(newMarkers);
       setMapCenter([parseFloat(firstResult.lat), parseFloat(firstResult.lon)]);
     } else {
-      setMapCenter([0, 0]);
+      setMapCenter(mapCenter);
       setMarkers([]);
     }
-  };
-
-  const clickMarker = (lat, lon) => {
-    const coords = [parseFloat(lat), parseFloat(lon)];
-    markerRefs.current.forEach((markerRef) => {
-      if (
-        markerRef &&
-        markerRef.getLatLng().lat === coords[0] &&
-        markerRef.getLatLng().lng === coords[1]
-      ) {
-        markerRef.openPopup();
-      }
-      return;
-    });
   };
 
   return (
@@ -74,7 +65,7 @@ export default function LocationSearch({
         </button>
       </form>
       {results.length > 0 && (
-        <div className="absolute border bg-white w-[273px] max-h-40 top-32 left-[10px] z-[1000]">
+        <div className="absolute border bg-white w-[273px] top-32 left-[10px] z-[1000]">
           <p
             className="p-1 bg-gray-100 font-semibold cursor-pointer select-none"
             onClick={() => setToggleLocations((prev) => !prev)}
@@ -82,16 +73,28 @@ export default function LocationSearch({
             Locations
           </p>
           {toggleLocations && (
-            <div className="overflow-x-hidden flex flex-col bg-white max-h-40">
-              {results.map((location, idx) => (
-                <button
-                  key={idx}
-                  className="hover:bg-gray-200 border-b p-1 text-left"
-                  onClick={() => clickMarker(location.lat, location.lon)}
-                >
-                  {location.name}, {location.address.county}
-                </button>
-              ))}
+            <div className="overflow-x-hidden flex flex-col bg-white max-h-96">
+              {results.map((location, idx) => {
+                let addressNames = location.display_name.split(",");
+                let name = "";
+
+                addressNames.forEach((item, idx) => {
+                  if (item != addressNames[addressNames.length - 1]) {
+                    name += item;
+                  }
+                });
+                return (
+                  <button
+                    key={idx}
+                    className="hover:bg-gray-200 border-b p-1 text-left"
+                    onClick={() =>
+                      clickMarker(clusterGroupRef, location.place_id)
+                    }
+                  >
+                    {name}, <b>{location.address.country}</b>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>

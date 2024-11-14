@@ -1,9 +1,8 @@
-export default function DeleteActivity({
-  modal,
-  setModal,
-  itinerary,
-  setItinerary,
-}) {
+import { useItinerary } from "../../pages/Itinerary";
+
+export default function DeleteActivity({ modal, setModal, setActivities }) {
+  const { itinerary, setItinerary } = useItinerary();
+  
   const handleDelete = async (e) => {
     e.preventDefault();
 
@@ -30,6 +29,7 @@ export default function DeleteActivity({
 
       if (response.ok) {
         setItinerary(updatedItinerary);
+        setActivities(newActivities);
         setModal(false);
       }
     } catch (error) {
@@ -40,7 +40,7 @@ export default function DeleteActivity({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-[1000]">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-[5000]">
       <div className="login-modal bg-white">
         <p className="text-lg text-center">Are you sure?</p>
         <form className="flex justify-evenly mt-3">

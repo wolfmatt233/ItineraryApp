@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { convertDate, getTime, removeTime } from "../functions/formatDate";
+import { convertDate, getTime, removeTime } from "../../functions/formatDate";
 
 export default function Calendar({ itinerary }) {
   let lastDate = null;

@@ -3,7 +3,7 @@ import { usePage } from "../../../App";
 import Itinerary from "./Itinerary";
 import { formatDate } from "../functions/formatDate";
 import Error from "../../Error";
-import DeleteItinerary from "../sub-components/delete/DeleteItinerary";
+import DeleteItinerary from "../sub-components/other/DeleteItinerary";
 import { useAuth } from "../../../context/AuthContext";
 
 export default function Itineraries() {

@@ -3,10 +3,9 @@ import Itineraries from "./Itineraries";
 import EditInfo from "../sub-components/edit/EditInfo";
 import { usePage } from "../../../App";
 import AddActivity from "../sub-components/add/AddActivity";
-import ActivitiesMap from "../sub-components/ActivityMap";
-import SelectMap from "../sub-components/add/SelectMap";
+import ActivityMap from "../sub-components/view/ActivityMap";
 import { useAuth } from "../../../context/AuthContext";
-import Calendar from "../sub-components/Calendar";
+import Calendar from "../sub-components/other/Calendar";
 import EditActivity from "../sub-components/edit/EditActivity";
 
 const ItineraryContext = createContext();
@@ -17,7 +16,6 @@ export default function Itinerary({ id }) {
   const { refreshLogin } = useAuth();
   const [itinerary, setItinerary] = useState({});
   const [loading, setLoading] = useState(true);
-  const [location, setLocation] = useState(false);
   const [showMap, setShowMap] = useState(true);
   const [activityId, setActivityId] = useState(false);
 
@@ -55,7 +53,7 @@ export default function Itinerary({ id }) {
   }, []);
 
   useEffect(() => {
-    if ((!showMap && location) || (!showMap && !location)) {
+    if (!showMap) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -64,6 +62,10 @@ export default function Itinerary({ id }) {
       document.body.style.overflow = "auto";
     };
   }, [showMap]);
+
+  useEffect(() => {
+    console.log(activityId, showMap);
+  }, [activityId]);
 
   if (loading) {
     return (
@@ -82,13 +84,12 @@ export default function Itinerary({ id }) {
           <EditInfo getItinerary={getItinerary} />
 
           {/* Show Activities Map, Select Location Map, Add Activity Form, or Edit Activity Form */}
-          {showMap && !location && !activityId ? (
-            <ActivitiesMap setActivityId={setActivityId} />
-          ) : !location && !showMap ? (
-            <SelectMap setLocation={setLocation} />
-          ) : !showMap && location ? (
-            <AddActivity setLocation={setLocation} location={location} />
-          ) : activityId && showMap && !location ? (
+
+          {showMap && !activityId ? (
+            <ActivityMap setActivityId={setActivityId} />
+          ) : !activityId && !showMap ? (
+            <AddActivity />
+          ) : activityId && !showMap ? (
             <EditActivity
               activityId={activityId}
               setActivityId={setActivityId}
@@ -101,3 +102,16 @@ export default function Itinerary({ id }) {
     </ItineraryContext.Provider>
   );
 }
+
+// {showMap && !location && !activityId ? (
+//   <ActivityMap setActivityId={setActivityId} />
+// ) : !location && !showMap ? (
+//   <SelectMap setLocation={setLocation} />
+// ) : !showMap && location ? (
+//   <AddActivity setLocation={setLocation} location={location} />
+// ) : activityId && showMap && !location ? (
+//   <EditActivity
+//     activityId={activityId}
+//     setActivityId={setActivityId}
+//   />
+// ) : null}

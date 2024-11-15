@@ -1,13 +1,13 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import ActivitiesList from "./view/ActivityList";
-import ActivitiesButtons from "./view/ActivityButtons";
-import DeleteActivity from "./delete/DeleteActivity";
-import { useItinerary } from "../pages/Itinerary";
-import ActivityMarkers from "./view/ActivityMarkers";
-import { removeTime } from "../functions/formatDate";
+import ActivitiesList from "./ActivityList";
+import ActivitiesButtons from "./ActivityButtons";
+import DeleteActivity from "./DeleteActivity";
+import { useItinerary } from "../../pages/Itinerary";
+import ActivityMarkers from "./ActivityMarkers";
+import { removeTime } from "../../functions/formatDate";
 
-const FilterContext = createContext();
-export const useFilter = () => useContext(FilterContext);
+const ActivityContext = createContext();
+export const useActivity = () => useContext(ActivityContext);
 
 export default function ActivityMap({ setActivityId }) {
   const { itinerary } = useItinerary();
@@ -16,6 +16,7 @@ export default function ActivityMap({ setActivityId }) {
       (a, b) => new Date(a.datetime) - new Date(b.datetime)
     )
   );
+  const [scroll, setScroll] = useState(false);
   const [modal, setModal] = useState(false);
   const [filterDate, setFilterDate] = useState("");
   const clusterGroupRef = useRef();
@@ -35,6 +36,17 @@ export default function ActivityMap({ setActivityId }) {
         (a, b) => new Date(a.datetime) - new Date(b.datetime)
       );
     }
+  };
+
+  const contextSharing = {
+    applyFilter,
+    filterDate,
+    setFilterDate,
+    clearFilter,
+    scroll,
+    setScroll,
+    setModal,
+    clusterGroupRef,
   };
 
   useEffect(() => {
@@ -66,31 +78,20 @@ export default function ActivityMap({ setActivityId }) {
 
   return (
     <div className="-mx-4 sm:mx-0 relative">
-      {modal && (
-        <DeleteActivity
-          modal={modal}
-          setModal={setModal}
-          setActivities={setActivities}
-        />
-      )}
-      <FilterContext.Provider
-        value={{ applyFilter, filterDate, setFilterDate, clearFilter }}
-      >
-        <ActivitiesButtons setActivities={setActivities} />
+      <ActivityContext.Provider value={contextSharing}>
+        {modal && (
+          <DeleteActivity modal={modal} setActivities={setActivities} />
+        )}
 
-        <ActivitiesList
-          activities={activities}
-          setActivities={setActivities}
-          clusterGroupRef={clusterGroupRef}
-        />
+        <ActivitiesButtons />
+
+        <ActivitiesList />
 
         <ActivityMarkers
-          setModal={setModal}
           setActivityId={setActivityId}
           activities={activities}
-          clusterGroupRef={clusterGroupRef}
         />
-      </FilterContext.Provider>
+      </ActivityContext.Provider>
     </div>
   );
 }

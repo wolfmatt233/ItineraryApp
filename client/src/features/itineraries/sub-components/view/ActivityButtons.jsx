@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { removeTime } from "../../functions/formatDate";
 import { useItinerary } from "../../pages/Itinerary";
-import { useFilter } from "../ActivityMap";
+import { useActivity } from "./ActivityMap";
 
-export default function ActivityButtons({ setActivities }) {
+export default function ActivityButtons() {
   const { itinerary, setShowMap } = useItinerary();
-  const { filterDate, setFilterDate, clearFilter } = useFilter();
+  const { filterDate, setFilterDate, clearFilter, scroll, setScroll } =
+    useActivity();
   const dateInputRef = useRef(null);
 
   const handleDivClick = () => {
@@ -16,12 +17,17 @@ export default function ActivityButtons({ setActivities }) {
 
   return (
     <>
+      {/* Add location */}
       <i
-        className="fa-solid fa-square-plus text-xl basic-button h-9 w-9 flex items-center justify-center absolute right-3 top-0 z-[1000] cursor-pointer"
+        className="fa-solid fa-square-plus map-btn top-0"
+        title="Add Location"
         onClick={() => setShowMap((prev) => !prev)}
       ></i>
+
+      {/* Filter by date */}
       <div
-        className="text-xl basic-button h-9 w-9 flex items-center justify-center absolute right-3 top-10 z-[1000] cursor-pointer"
+        className="map-btn top-10"
+        title="Date Filter"
         onClick={handleDivClick}
       >
         <i className="fa-regular fa-calendar"></i>
@@ -38,16 +44,22 @@ export default function ActivityButtons({ setActivities }) {
           value={filterDate}
         />
       </div>
+
+      {/* Toggle scroll */}
+      <i
+        className={`fa-solid fa-toggle-${scroll ? "on" : "off"} top-20 map-btn`}
+        title="Scroll Toggle"
+        onClick={() => setScroll((prev) => !prev)}
+      ></i>
+
+      {/* Clear filter */}
       {filterDate && (
         <i
-          className="fa-solid fa-xmark text-xl basic-button h-9 w-9 flex items-center justify-center absolute right-3 top-[120px] z-[1000] cursor-pointer"
+          className="fa-solid fa-xmark top-[120px] map-btn"
+          title="Clear Filter"
           onClick={clearFilter}
         ></i>
       )}
-      {/* <i
-        className="fa-solid fa-toggle-on text-xl basic-button h-9 w-9 flex items-center justify-center absolute right-3 top-20 z-[1000] cursor-pointer"
-        onClick={setScroll((prev) => !prev)}
-      ></i> */}
     </>
   );
 }

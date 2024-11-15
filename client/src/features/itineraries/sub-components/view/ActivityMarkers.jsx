@@ -5,36 +5,81 @@ import {
   Polyline,
   Popup,
   TileLayer,
+  useMap,
+  ZoomControl,
 } from "react-leaflet";
-import { convertDate, getTime, removeTime } from "../../functions/formatDate";
+import { convertDate, getTime } from "../../functions/formatDate";
 import MarkerClusterGroup from "react-leaflet-markercluster";
-import { createNumberedIcon, FitBounds, generateLines } from "../../functions/mapFunctions";
-import { getFirstActivity } from "../../functions/getFirstActivity";
-import { useFilter } from "../ActivityMap";
+import { useActivity } from "./ActivityMap";
+import { useEffect } from "react";
+import { getFirstActivity } from "../../functions/mapFunctions";
+import { useItinerary } from "../../pages/Itinerary";
 
-export default function ActivityMarkers({
-  activities,
-  setModal,
-  setActivityId,
-  clusterGroupRef,
-}) {
-  const { applyFilter } = useFilter();
+export default function ActivityMarkers({ activities, setActivityId }) {
+  const { applyFilter, scroll, setModal, clusterGroupRef } = useActivity();
+  const { setShowMap } = useItinerary();
   const filteredActivities = applyFilter();
   const firstCoords = getFirstActivity(filteredActivities);
-  const lineMap = generateLines(filteredActivities);
+  const lineMap = activities
+    .sort((a, b) => new Date(a.datetime) - new Date(b.datetime))
+    .map((activities) => {
+      const coords = activities.location.coordinates;
+      return [coords.lat, coords.lon];
+    });
+
+  const MapUpdater = () => {
+    const map = useMap();
+
+    const coordinates = () => {
+      return activities
+        .filter((activity) => activity.completed === false)
+        .map((activities) => {
+          const coords = activities.location.coordinates;
+          return [coords.lat, coords.lon];
+        });
+    };
+
+    const coords = coordinates();
+
+    useEffect(() => {
+      if (coords.length > 0) {
+        map.fitBounds(coords, { padding: [20, 20] });
+      }
+    }, [map, coords]);
+
+    useEffect(() => {
+      if (scroll) {
+        map.scrollWheelZoom.enable();
+      } else {
+        map.scrollWheelZoom.disable();
+      }
+    }, [map, scroll]);
+
+    return null;
+  };
+
+  const createNumberedIcon = (number, completed) => {
+    return L.divIcon({
+      html: `<div>${number}</div>`,
+      className: `map-marker ${completed && "bg-gray-500"}`,
+      iconSize: [30, 30],
+    });
+  };
 
   return (
     <MapContainer
       className="w-full h-[500px]"
-      center={firstCoords}
       zoom={3}
+      center={firstCoords}
       scrollWheelZoom={false}
+      zoomControl={false}
     >
-      <FitBounds activities={activities} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
       />
+      <MapUpdater />
+      <ZoomControl position="bottomright" />
       <MarkerClusterGroup ref={clusterGroupRef}>
         {filteredActivities.map((activity, idx) => {
           const coords = activity.location.coordinates;
@@ -73,7 +118,10 @@ export default function ActivityMarkers({
                 <div className="flex items-center justify-between border-t py-2">
                   <button
                     className="link-button mr-2"
-                    onClick={() => setActivityId(activity._id)}
+                    onClick={() => {
+                      setActivityId(activity._id);
+                      setShowMap(false);
+                    }}
                   >
                     Edit
                   </button>

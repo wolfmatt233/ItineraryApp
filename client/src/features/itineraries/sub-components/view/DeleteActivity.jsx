@@ -1,8 +1,10 @@
 import { useItinerary } from "../../pages/Itinerary";
+import { useActivity } from "./ActivityMap";
 
-export default function DeleteActivity({ modal, setModal, setActivities }) {
+export default function DeleteActivity({ modal, setActivities }) {
   const { itinerary, setItinerary } = useItinerary();
-  
+  const { setModal } = useActivity();
+
   const handleDelete = async (e) => {
     e.preventDefault();
 
@@ -31,6 +33,9 @@ export default function DeleteActivity({ modal, setModal, setActivities }) {
         setItinerary(updatedItinerary);
         setActivities(newActivities);
         setModal(false);
+      } else {
+        refreshLogin();
+        handleDelete(e);
       }
     } catch (error) {
       console.log(error);

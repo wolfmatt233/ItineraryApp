@@ -1,10 +1,16 @@
 import { useState } from "react";
 import { convertDate, removeTime } from "../../functions/formatDate";
 import { clickMarker } from "../../functions/mapFunctions";
-import { useFilter } from "../ActivityMap";
+import { useActivity } from "./ActivityMap";
 
-export default function ActivityList({ clusterGroupRef }) {
-  const { applyFilter, filterDate, setFilterDate, clearFilter } = useFilter();
+export default function ActivityList() {
+  const {
+    applyFilter,
+    filterDate,
+    setFilterDate,
+    clearFilter,
+    clusterGroupRef,
+  } = useActivity();
   const filteredActivities = applyFilter();
   const [toggleLocations, setToggleLocations] = useState(true);
   let lastDate = null;
@@ -23,13 +29,20 @@ export default function ActivityList({ clusterGroupRef }) {
         <div
           className={`${
             !toggleLocations ? "w-fit" : "w-[273px]"
-          } absolute bg-white max-h-40 top-24 left-[10px] z-[1000]`}
+          } absolute bg-white max-h-40 left-3 top-[10px] z-[1000] rounded-t-md`}
         >
           <p
-            className="p-1 rounded-t-md site-green text-white font-semibold cursor-pointer select-none"
+            className={`p-1 ${
+              toggleLocations ? "rounded-t-md" : "rounded-sm"
+            } list-title`}
             onClick={() => setToggleLocations((prev) => !prev)}
           >
             Locations
+            <i
+              className={`fa-solid fa-caret-${
+                toggleLocations ? "up mt-1" : "down"
+              } ml-2 mr-1`}
+            ></i>
           </p>
 
           {toggleLocations && (
@@ -43,15 +56,16 @@ export default function ActivityList({ clusterGroupRef }) {
                   <div key={idx} className="flex flex-col">
                     {showHeader && (
                       <button
-                        className="bg-gray-300 p-2 font-bold text-left"
+                        className="bg-gray-200 p-2 font-bold text-left hover:bg-gray-300 flex items-center justify-between border-t border-gray-300"
                         onClick={() => handleFilterClick(activity)}
                       >
                         {convertDate(activity.datetime)}
+                        <i className="fa-regular fa-calendar"></i>
                       </button>
                     )}
 
                     <button
-                      className="hover:bg-gray-200 border-b p-1 text-left"
+                      className="hover:bg-gray-200 border-t border-gray-300 p-1 text-left"
                       onClick={() => {
                         clickMarker(clusterGroupRef, activity._id);
                       }}

@@ -1,132 +1,55 @@
-import { useState } from "react";
-import { removeTime } from "../../functions/formatDate";
-import { useAuth } from "../../../../context/AuthContext";
+import { useEffect, useRef, useState } from "react";
+import LocationSearch from "../add/LocationSearch";
 import { useItinerary } from "../../pages/Itinerary";
+import AddForm from "./AddForm";
+import SelectMap from "./SelectMap";
 
-export default function AddActivity({ setLocation, location }) {
-  const { id, itinerary, setItinerary, setShowMap } = useItinerary();
-  const [newActivity, setNewActivity] = useState({
-    date: "",
-    time: "",
-    activity: "",
-    location: {
-      name: location.name.split(",")[0],
-      coordinates: {
-        lat: location.position[0],
-        lon: location.position[1],
-      },
-    },
-    notes: "",
-    completed: false,
-  });
+export default function AddActivity() {
+  const { setShowMap } = useItinerary();
+  const [markers, setMarkers] = useState([]);
+  const [location, setLocation] = useState(false);
+  const clusterGroupRef = useRef();
 
-  const handleChange = (e) => {
-    let { name, value } = e.target;
-
-    setNewActivity((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handleClose = (e) => {
-    setLocation(false);
-    setShowMap(true);
-  };
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-
-    const { date, time, ...restOfActivity } = newActivity;
-
-    const activityWithTime = {
-      ...restOfActivity,
-      datetime: `${date}T${time}:00`,
-    };
-
-    const updatedItinerary = {
-      ...itinerary,
-      activities: [...itinerary.activities, activityWithTime],
-    };
-
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/itineraries/${id}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify(updatedItinerary),
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setItinerary(data);
-        handleClose();
-      } else {
-        refreshLogin();
-        handleSave();
-      }
-    } catch (error) {
-      console.log(error);
-      alert("Activity creation failed.");
+  useEffect(() => {
+    if (!location) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
     }
-  };
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [location]);
 
   return (
-    <form className="flex flex-col">
-      <p>
-        New Location Selected: <b>{newActivity.location.name}</b>
-      </p>
-      <label htmlFor="date">Date</label>
-      <input
-        type="date"
-        name="date"
-        min={removeTime(itinerary.startDate)}
-        max={removeTime(itinerary.endDate)}
-        className="basic-input"
-        onChange={handleChange}
-      />
-      <label htmlFor="time">Time</label>
-      <input
-        type="time"
-        name="time"
-        className="basic-input"
-        onChange={handleChange}
-      />
-      <label htmlFor="activity">Activity</label>
-      <input
-        type="text"
-        name="activity"
-        className="basic-input"
-        onChange={handleChange}
-      />
-      <label htmlFor="notes">Notes</label>
-      <textarea
-        name="notes"
-        rows={4}
-        className="basic-input"
-        onChange={handleChange}
-      ></textarea>
-      <div className="flex items-center">
-        <button
-          className="h-10 border border-gray-300 hover:bg-gray-200 mr-2 w-1/2"
-          onClick={handleClose}
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="h-10 border text-white bg-[#4ABDAC] hover:bg-[#F7B733] mr-2 w-1/2"
-          onClick={handleSave}
-        >
-          Add Activity
-        </button>
-      </div>
-    </form>
+    <>
+      {location ? (
+        <AddForm setLocation={setLocation} location={location} />
+      ) : (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 h-screen">
+          <div className="h-screen">
+            {/* Exit button */}
+            <i
+              className="fa-solid fa-circle-xmark exit-map-btn"
+              onClick={() => setShowMap((prev) => !prev)}
+            ></i>
+
+            {/* Standard input search */}
+            <LocationSearch
+              setMarkers={setMarkers}
+              clusterGroupRef={clusterGroupRef}
+              setLocation={setLocation}
+            />
+
+            {/* Map with search markers */}
+            <SelectMap
+              markers={markers}
+              setLocation={setLocation}
+              clusterGroupRef={clusterGroupRef}
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 }

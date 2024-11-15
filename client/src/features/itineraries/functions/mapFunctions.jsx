@@ -1,32 +1,23 @@
-import { useEffect } from "react";
-import { useMap } from "react-leaflet";
+export const getFirstActivity = (activities) => {
+  if (activities.length == 0) return [0, 0];
 
-export const generateLines = (activities) => {
-  return activities
-    .sort((a, b) => new Date(a.datetime) - new Date(b.datetime))
-    .map((activities) => {
-      const coords = activities.location.coordinates;
-      return [coords.lat, coords.lon];
-    });
-};
+  const firstIncomplete = activities.find(
+    (activity) => activity.complete === false
+  );
 
-export function FitBounds({ activities }) {
-  const map = useMap();
-  const coordinates = activities
+  if (firstIncomplete) {
+    console.log(firstIncomplete);
+    const coords = firstIncomplete.location.coordinates;
+    return [coords.lat, coords.lon];
+  }
+
+  const firstDate = activities
     .filter((activity) => activity.completed === false)
-    .map((activities) => {
-      const coords = activities.location.coordinates;
-      return [coords.lat, coords.lon];
-    });
+    .sort((a, b) => new Date(a.date) - new Date(b.date)[0]);
 
-  useEffect(() => {
-    if (coordinates.length) {
-      map.fitBounds(coordinates, { padding: [20, 20] });
-    }
-  }, [map, coordinates]);
-
-  return null;
-}
+  const coords = firstDate[0].location.coordinates;
+  return [coords.lat, coords.lon];
+};
 
 export const clickMarker = (clusterGroupRef, id) => {
   const layers = clusterGroupRef.current.getLayers();
@@ -37,13 +28,5 @@ export const clickMarker = (clusterGroupRef, id) => {
         layer.openPopup();
       });
     }
-  });
-};
-
-export const createNumberedIcon = (number, completed) => {
-  return L.divIcon({
-    html: `<div>${number}</div>`,
-    className: `map-marker ${completed && "bg-gray-500"}`,
-    iconSize: [30, 30],
   });
 };

@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { removeTime } from "../../functions/formatDate";
-import { useAuth } from "../../../../context/AuthContext";
 import { useItinerary } from "../../pages/Itinerary";
+import { apiRequests } from "../../functions/apiRequests";
 
 export default function AddForm({ setLocation, location }) {
-  const { refreshLogin } = useAuth();
   const { id, itinerary, setItinerary, setShowMap } = useItinerary();
+  const { updateItinerary } = apiRequests();
   const [editToggle, setEditToggle] = useState(() => {
     return location === "none" ? true : false;
   });
@@ -27,7 +27,7 @@ export default function AddForm({ setLocation, location }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "coords_lat" || name === "coords_lng") {
+    if (name === "coords_lat" || name === "coords_lon") {
       setNewActivity((prevData) => ({
         ...prevData,
         location: {
@@ -38,8 +38,7 @@ export default function AddForm({ setLocation, location }) {
           },
         },
       }));
-    }
-    if (name === "location") {
+    } else if (name === "location") {
       setNewActivity((prevData) => ({
         ...prevData,
         location: {
@@ -79,36 +78,20 @@ export default function AddForm({ setLocation, location }) {
       activities: [...itinerary.activities, activityWithTime],
     };
 
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/itineraries/${id}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify(updatedItinerary),
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    const res = await updateItinerary(id, updatedItinerary);
+    const { response, data } = res;
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setItinerary(data);
-        handleClose();
-      } else {
-        refreshLogin();
-        handleSave(e);
-      }
-    } catch (error) {
-      console.log(error);
-      alert("Activity creation failed.");
+    if (response.ok) {
+      setItinerary(data);
+      handleClose();
+    } else {
+      alert("Failed to add activity.");
     }
   };
 
   return (
     <form className="flex flex-col">
+      <p className="page-title text-lg">Add Location</p>
       {editToggle ? (
         <>
           <label htmlFor="location">Location</label>
@@ -137,11 +120,14 @@ export default function AddForm({ setLocation, location }) {
           />
         </>
       ) : (
-        <div>
+        <div className="flex items-center">
           <p>
             New Location Selected: <b>{newActivity.location.name}</b>
           </p>
-          <button onClick={handleEdit}>Edit</button>
+          <i
+            className="fa-solid fa-pen-to-square ml-2 basic-button h-7 w-7 flex items-center justify-center cursor-pointer"
+            onClick={handleEdit}
+          ></i>
         </div>
       )}
       <label htmlFor="date">Date</label>
@@ -176,14 +162,15 @@ export default function AddForm({ setLocation, location }) {
       ></textarea>
       <div className="flex items-center">
         <button
-          className="h-10 border border-gray-300 hover:bg-gray-200 mr-2 w-1/2"
+          type="button"
+          className="h-10 border border-gray-300 hover:bg-gray-200 mr-2 w-1/2 cursor-pointer"
           onClick={handleClose}
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="h-10 border text-white bg-[#4ABDAC] hover:bg-[#F7B733] mr-2 w-1/2"
+          className="h-10 border text-white bg-[#4ABDAC] hover:bg-[#F7B733] w-1/2"
           onClick={handleSave}
         >
           Add Activity

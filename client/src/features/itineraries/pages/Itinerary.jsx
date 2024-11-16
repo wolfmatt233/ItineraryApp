@@ -4,47 +4,34 @@ import EditInfo from "../sub-components/edit/EditInfo";
 import { usePage } from "../../../App";
 import AddActivity from "../sub-components/add/AddActivity";
 import ActivityMap from "../sub-components/view/ActivityMap";
-import { useAuth } from "../../../context/AuthContext";
-import Calendar from "../sub-components/other/Calendar";
+import Calendar from "../sub-components/view/Calendar";
 import EditActivity from "../sub-components/edit/EditActivity";
+import { apiRequests } from "../functions/apiRequests";
+import { useAuth } from "../../../context/AuthContext";
+import Loading from "../../../layouts/Loading";
 
 const ItineraryContext = createContext();
 export const useItinerary = () => useContext(ItineraryContext);
 
 export default function Itinerary({ id }) {
   const { setPage } = usePage();
-  const { refreshLogin } = useAuth();
+  const { fetchItinerary } = apiRequests();
   const [itinerary, setItinerary] = useState({});
   const [loading, setLoading] = useState(true);
   const [showMap, setShowMap] = useState(true);
+  const [showCalendar, setShowCalendar] = useState(false);
   const [activityId, setActivityId] = useState(false);
 
   const getItinerary = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/itineraries/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
+    const res = await fetchItinerary(id);
+    const { response, data } = res;
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setItinerary(data);
-        setLoading(false);
-      } else if (response.status === 404) {
-        setPage(<Itineraries />);
-        console.log("No itinerary found");
-      } else {
-        refreshLogin();
-        getItinerary();
-      }
-    } catch (error) {
+    if (response.ok) {
+      setItinerary(data);
+      setLoading(false);
+    } else {
       setPage(<Itineraries />);
-      alert("Failed to retrieve itinerary");
+      alert("Couldn't find that itinerary.");
     }
   };
 
@@ -53,65 +40,57 @@ export default function Itinerary({ id }) {
   }, []);
 
   useEffect(() => {
+    let overflow = document.body.style.overflow;
+
+    if (activityId) overflow = "auto";
+
     if (!showMap) {
-      document.body.style.overflow = "hidden";
+      overflow = "hidden";
     } else {
-      document.body.style.overflow = "auto";
+      overflow = "auto";
     }
-    return () => {
-      document.body.style.overflow = "auto";
-    };
   }, [showMap]);
 
   useEffect(() => {
-    console.log(activityId, showMap);
-  }, [activityId]);
+    setActivityId(false);
+    setShowMap(true);
+  }, [showCalendar]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center page-layout">
-        <i className="fas fa-circle-notch fa-spin text-5xl text-black"></i>
-      </div>
-    );
-  }
+  if (loading) return <Loading />;
 
   return (
     <ItineraryContext.Provider
-      value={{ id, itinerary, setItinerary, setShowMap }}
+      value={{
+        id,
+        itinerary,
+        setItinerary,
+        setShowMap,
+        showCalendar,
+        setShowCalendar,
+      }}
     >
       {itinerary && (
         <div className="page-layout flex flex-col">
-          <EditInfo getItinerary={getItinerary} />
+          <EditInfo />
 
-          {/* Show Activities Map, Select Location Map, Add Activity Form, or Edit Activity Form */}
+          {/* Map, form, and calendar display */}
 
-          {showMap && !activityId ? (
-            <ActivityMap setActivityId={setActivityId} />
-          ) : !activityId && !showMap ? (
-            <AddActivity />
-          ) : activityId && !showMap ? (
-            <EditActivity
-              activityId={activityId}
-              setActivityId={setActivityId}
-            />
-          ) : null}
-
-          <Calendar itinerary={itinerary} />
+          {!showCalendar ? (
+            showMap && !activityId ? (
+              <ActivityMap setActivityId={setActivityId} />
+            ) : !activityId && !showMap ? (
+              <AddActivity />
+            ) : activityId && !showMap ? (
+              <EditActivity
+                activityId={activityId}
+                setActivityId={setActivityId}
+              />
+            ) : null
+          ) : (
+            <Calendar itinerary={itinerary} />
+          )}
         </div>
       )}
     </ItineraryContext.Provider>
   );
 }
-
-// {showMap && !location && !activityId ? (
-//   <ActivityMap setActivityId={setActivityId} />
-// ) : !location && !showMap ? (
-//   <SelectMap setLocation={setLocation} />
-// ) : !showMap && location ? (
-//   <AddActivity setLocation={setLocation} location={location} />
-// ) : activityId && showMap && !location ? (
-//   <EditActivity
-//     activityId={activityId}
-//     setActivityId={setActivityId}
-//   />
-// ) : null}

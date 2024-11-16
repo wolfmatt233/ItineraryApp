@@ -92,7 +92,7 @@ router.post("/refresh-token", async (req, res) => {
 
     res.json({ accessToken: newAccessToken });
   } catch (error) {
-    res.status(403).json({ message: "Invalid refresh token" });
+    res.status(500).json({ message: "Error refreshing token" });
   }
 });
 

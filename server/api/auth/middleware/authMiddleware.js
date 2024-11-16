@@ -6,7 +6,10 @@ const authMiddleware = async (req, res, next) => {
   if (!token) {
     return res
       .status(400)
-      .json({ message: "Authorization is denied, no token provided" });
+      .json({
+        message:
+          "JWT Verification Error: No token provided",
+      });
   }
 
   try {
@@ -16,7 +19,9 @@ const authMiddleware = async (req, res, next) => {
     next();
   } catch (error) {
     console.error("JWT Verification Error:", error.name, error.message); // Log error details
-    res.status(403).json({ message: "Token is not valid" });
+    res
+      .status(403)
+      .json({ message: "JWT Verification Error: Token is not valid or is expired" });
   }
 };
 

@@ -65,30 +65,33 @@ An itenerary website that allows you to create an itenerary on a day by day basi
   - [ ] Change username
 
 - [x] Create Itinerary
-- [ ] Create locations/activities
+- [x] Create activities
 
-- [ ] Read Itinerary
+- [x] Read Itinerary
 
   - [x] Display all itineraries to select from
-  - [ ] View Individual itineraries
+  - [x] View Individual itineraries
     - [x] View Title and dates
-    - [ ] View locations/activities
+    - [x] View activities
 
-- [ ] Update Itinerary
+- [x] Update Itinerary
 
   - [x] Update Title and dates
-  - [ ] Update locations/activities
+  - [x] Update activities
     - [ ] Mark as complete
 
 - [x] Delete Itinerary
 
-  - [ ] Delete locations/activities
+  - [x] Delete activities
+
+- [ ] Error handling
 
 - [ ] Interactive Components
 
-  - [ ] Choose a location from the map (API)
+  - [x] Choose a location from the map via search (name or coordinates)
+  - [x] Filter itinerary by date
   - [ ] View up to date itinerary on the map with numbered markers organized by colors based on the day
-    - [ ] Completed activities grayed out
+    - [x] Completed activities grayed out
   - [ ] View activities in a calendar view
     - [ ] Export activities to external calendar applications
 

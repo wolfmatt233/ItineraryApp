@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { getTime, removeTime } from "../../functions/formatDate";
 import { useItinerary } from "../../pages/Itinerary";
+import { apiRequests } from "../../functions/apiRequests";
 
 export default function EditActivity({ activityId, setActivityId }) {
   const { id, itinerary, setItinerary, setShowMap } = useItinerary();
+  const { updateItinerary } = apiRequests();
   const [activity, setActivity] = useState(
     itinerary.activities.filter((activity) => activity._id === activityId)[0]
   );
@@ -51,31 +53,15 @@ export default function EditActivity({ activityId, setActivityId }) {
       ),
     };
 
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/itineraries/${id}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify(updatedItinerary),
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    const res = await updateItinerary(id, updatedItinerary);
+    const { response, data } = res;
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setItinerary(data);
-        handleClose();
-      } else {
-        refreshLogin();
-        handleSave();
-      }
-    } catch (error) {
-      console.log(error);
-      alert("Activity creation failed.");
+    if (response.ok) {
+      setItinerary(data);
+      handleClose();
+    } else {
+      refreshLogin();
+      handleSave();
     }
   };
 
@@ -83,10 +69,6 @@ export default function EditActivity({ activityId, setActivityId }) {
     setActivityId(false);
     setShowMap(true);
   };
-
-  useEffect(() => {
-    console.log(datetime.time);
-  }, []);
 
   return (
     <form className="flex flex-col">
@@ -149,6 +131,7 @@ export default function EditActivity({ activityId, setActivityId }) {
       ></textarea>
       <div className="flex items-center">
         <button
+          type="button"
           className="h-10 border border-gray-300 hover:bg-gray-200 mr-2 w-1/2"
           onClick={handleClose}
         >
@@ -156,7 +139,7 @@ export default function EditActivity({ activityId, setActivityId }) {
         </button>
         <button
           type="submit"
-          className="h-10 border text-white bg-[#4ABDAC] hover:bg-[#F7B733] mr-2 w-1/2"
+          className="h-10 border text-white bg-[#4ABDAC] hover:bg-[#F7B733] w-1/2"
           onClick={handleUpdate}
         >
           Update Activity

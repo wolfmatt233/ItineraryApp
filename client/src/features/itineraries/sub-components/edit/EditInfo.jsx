@@ -1,45 +1,37 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { formatDate, removeTime } from "../../functions/formatDate";
 import { useItinerary } from "../../pages/Itinerary";
+import { apiRequests } from "../../functions/apiRequests";
 
-export default function EditInfo({ getItinerary }) {
-  const { id, itinerary, setItinerary } = useItinerary();
+export default function EditInfo() {
+  const { id, itinerary, setItinerary, showCalendar, setShowCalendar } =
+    useItinerary();
+  const { updateItinerary } = apiRequests();
   const [edit, setEdit] = useState(false);
+  const [updatedItinerary, setUpdatedItinerary] = useState(itinerary);
 
   const handleChange = (e) => {
     let { name, value } = e.target;
 
-    setItinerary((prevData) => ({
+    setUpdatedItinerary((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
 
   const cancelEdit = () => {
-    getItinerary();
+    setItinerary(itinerary);
     setEdit(false);
   };
 
   const handleSave = async () => {
-    try {
-      const save = await fetch(`http://localhost:5000/api/itineraries/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify(itinerary),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
+    const res = await updateItinerary(id, updatedItinerary);
+    const { response, data } = res;
 
-      const data = await save.json();
-
-      if (save.status === 200) {
-        setEdit(false);
-      } else {
-        cancelEdit();
-        alert(data.message);
-      }
-    } catch (error) {
+    if (response.ok) {
+      setItinerary(updatedItinerary);
+      setEdit(false);
+    } else {
       cancelEdit();
       alert("Failed to save info.");
     }
@@ -55,7 +47,7 @@ export default function EditInfo({ getItinerary }) {
               <input
                 type="text"
                 name="title"
-                value={itinerary.title}
+                value={updatedItinerary.title}
                 className="basic-input w-full mr-2"
                 onChange={handleChange}
               />
@@ -81,8 +73,10 @@ export default function EditInfo({ getItinerary }) {
           </>
         )}
       </div>
-      <div className="flex flex-wrap">
-        <div className="flex flex-col mr-2 mb-2">
+
+      <div className="flex flex-wrap items-center">
+        {/* Start Date */}
+        <div className="flex flex-col mr-2">
           <p>
             Start Date{" "}
             {edit && <span className="text-sm text-gray-500">(editing)</span>}
@@ -91,18 +85,19 @@ export default function EditInfo({ getItinerary }) {
             <input
               type="date"
               name="startDate"
-              value={removeTime(itinerary.startDate)}
+              value={removeTime(updatedItinerary.startDate)}
               onChange={handleChange}
               className="mb-2 size-fit bg-gray-300 p-2 rounded-md"
             />
           ) : (
-            <p className="mb-2 size-fit bg-[#4ABDAC] text-white p-2 rounded-md">
-              {formatDate(itinerary.startDate)}{" "}
+            <p className="mb-2 size-fit site-green text-white p-2 rounded-md">
+              {formatDate(updatedItinerary.startDate)}{" "}
               <i className="fa-regular fa-calendar"></i>
             </p>
           )}
         </div>
 
+        {/* End Date */}
         <div className="flex flex-col">
           <p>
             End Date{" "}
@@ -112,17 +107,25 @@ export default function EditInfo({ getItinerary }) {
             <input
               type="date"
               name="endDate"
-              value={removeTime(itinerary.endDate)}
+              value={removeTime(updatedItinerary.endDate)}
               onChange={handleChange}
               className="mb-2 size-fit bg-gray-300 p-2 rounded-md"
             />
           ) : (
-            <p className="mb-2 size-fit bg-[#4ABDAC] text-white p-2 rounded-md">
-              {formatDate(itinerary.endDate)}{" "}
+            <p className="mb-2 size-fit site-green text-white p-2 rounded-md">
+              {formatDate(updatedItinerary.endDate)}{" "}
               <i className="fa-regular fa-calendar"></i>
             </p>
           )}
         </div>
+
+        <button
+          className="site-green size-fit text-white flex items-center rounded-md p-2 mt-4 hover:site-yellow ml-2"
+          onClick={() => setShowCalendar((prev) => !prev)}
+        >
+          {!showCalendar ? "Show Calendar" : "Show Map"}{" "}
+          <i class="fa-solid fa-eye ml-2"></i>
+        </button>
       </div>
     </>
   );

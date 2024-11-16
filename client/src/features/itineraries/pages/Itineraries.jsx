@@ -3,42 +3,37 @@ import { usePage } from "../../../App";
 import Itinerary from "./Itinerary";
 import { formatDate } from "../functions/formatDate";
 import Error from "../../Error";
-import DeleteItinerary from "../sub-components/other/DeleteItinerary";
-import { useAuth } from "../../../context/AuthContext";
+import DeleteItinerary from "../sub-components/delete/DeleteItinerary";
+import { apiRequests } from "../functions/apiRequests";
+import Loading from "../../../layouts/Loading";
 
 export default function Itineraries() {
   const { setPage } = usePage();
-  const { refreshLogin } = useAuth();
+  const { fetchItineraries } = apiRequests();
   const [itineraries, setItineraries] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [edit, setEdit] = useState(false);
   const [modal, setModal] = useState(false);
 
   const getItineraries = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/api/itineraries", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
+    const res = await fetchItineraries();
+    const { response, data } = res;
 
-      const data = await response.json();
-
-      if (response.status === 403) {
-        refreshLogin();
-      } else if (!data.items) {
-        setError(data.message);
-      } else {
-        setItineraries(data.items);
-      }
-    } catch (error) {
-      console.log(error);
+    if (!data.items) {
+      setError(data.message);
+    } else {
+      setItineraries(data.items);
     }
+
+    setLoading(false);
   };
 
   useEffect(() => {
     getItineraries();
   }, []);
+
+  if (loading) return <Loading />;
 
   return (
     <div className="page-layout relative">
@@ -85,6 +80,7 @@ export default function Itineraries() {
               {modal == item._id && (
                 <DeleteItinerary
                   id={item._id}
+                  name={item.title}
                   setModal={setModal}
                   setItineraries={setItineraries}
                 />

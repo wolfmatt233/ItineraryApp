@@ -1,9 +1,11 @@
+import { apiRequests } from "../../functions/apiRequests";
 import { useItinerary } from "../../pages/Itinerary";
-import { useActivity } from "./ActivityMap";
+import { useActivity } from "../view/ActivityMap";
 
 export default function DeleteActivity({ modal, setActivities }) {
   const { itinerary, setItinerary } = useItinerary();
   const { setModal } = useActivity();
+  const { updateItinerary } = apiRequests();
 
   const handleDelete = async (e) => {
     e.preventDefault();
@@ -14,33 +16,15 @@ export default function DeleteActivity({ modal, setActivities }) {
 
     const updatedItinerary = { ...itinerary, activities: newActivities };
 
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/itineraries/${itinerary._id}`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedItinerary),
-        }
-      );
+    const res = await updateItinerary(itinerary._id, updatedItinerary);
+    const { response, data } = res;
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setItinerary(updatedItinerary);
-        setActivities(newActivities);
-        setModal(false);
-      } else {
-        refreshLogin();
-        handleDelete(e);
-      }
-    } catch (error) {
-      console.log(error);
+    if (response.ok) {
+      setItinerary(data);
+      setActivities(data.activities);
       setModal(false);
-      alert("Deletion failed");
+    } else {
+      alert("Deletion failed.");
     }
   };
 

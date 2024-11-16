@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import ActivitiesList from "./ActivityList";
 import ActivitiesButtons from "./ActivityButtons";
-import DeleteActivity from "./DeleteActivity";
+import DeleteActivity from "../delete/DeleteActivity";
 import { useItinerary } from "../../pages/Itinerary";
 import ActivityMarkers from "./ActivityMarkers";
 import { removeTime } from "../../functions/formatDate";

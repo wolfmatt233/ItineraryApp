@@ -14,7 +14,7 @@ export default function App() {
   const [page, setPage] = useState("");
 
   useEffect(() => {
-    if (user != null) {
+    if (user) {
       setPage(<Itineraries />);
     } else {
       setPage(<Login />);

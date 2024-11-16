@@ -1,101 +1,60 @@
 import { createContext, useState, useContext, useEffect } from "react";
+import { authRequests } from "./authRequests";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [initLoad, setInitLoad] = useState(true);
+  const { fetchUser, tokenRefresh, fetchLogin } = authRequests();
 
-  const checkLogin = async () => {
-    try {
-      const userResponse = await fetch("http://localhost:5000/api/auth/user", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
+  const getUser = async () => {
+    const res = await fetchUser();
+    const { response, data } = res;
 
-      const userData = await userResponse.json();
-
-      if (userData.message) {
-        // if the user cannot be retrieved due to outdated access token
-        // try to refresh it with the refresh token
-        refreshLogin();
-      } else {
-        setUser(userData);
-        setLoading(false);
-      }
-    } catch (error) {
-      alert("Error logging in");
-    }
-  };
-
-  const refreshLogin = async () => {
-    try {
-      // Refresh the access token using the refresh token
-      const refreshResponse = await fetch(
-        "http://localhost:5000/api/auth/refresh-token",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            refreshToken: localStorage.getItem("refreshToken"),
-          }),
-        }
-      );
-
-      const data = await refreshResponse.json();
-
-      if (data.accessToken) {
-        // Recheck the user
-        localStorage.setItem("accessToken", data.accessToken);
-        checkLogin();
-      } else {
-        // Invalid or empty refresh token error
-        logout();
-        setLoading(false);
-        alert(data.message);
-      }
-    } catch (error) {
-      alert("Error refreshing your login");
-      logout();
+    if (response.ok) {
+      setInitLoad(false);
+      setUser(data);
+      setLoading(false);
+    } else if (response.status === 403) {
+      // try to refresh expired token with a new one
+      refreshLogin();
       setLoading(false);
     }
   };
 
-  const login = async (formData) => {
-    try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+  const refreshLogin = async () => {
+    const res = await tokenRefresh();
+    const { response, data } = res;
 
-      const data = await response.json();
+    if (data.accessToken) {
+      // On successfull refresh, set new access token
+      localStorage.setItem("accessToken", data.accessToken);
 
-      if (data.accessToken && data.refreshToken) {
-        localStorage.setItem("accessToken", data.accessToken);
-        localStorage.setItem("refreshToken", data.refreshToken);
-
-        const userResponse = await fetch(
-          "http://localhost:5000/api/auth/user",
-          {
-            headers: {
-              Authorization: `Bearer ${data.accessToken}`,
-            },
-          }
-        );
-
-        const userData = await userResponse.json();
-        setUser(userData);
-      } else {
-        alert("Login Failed");
+      // Prevent component reload on token refresh, only on init
+      if (initLoad) {
+        getUser();
       }
-    } catch (error) {
-      alert(error);
+    } else {
+      // Invalid or empty refresh token, logout
+      logout();
+    }
+
+    setLoading(false);
+  };
+
+  const login = async (formData) => {
+    const res = await fetchLogin(formData);
+    const { response, data } = res;
+
+    if (data.accessToken && data.refreshToken) {
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+
+      getUser();
+    } else {
+      alert("Invalid credentials");
     }
   };
 
@@ -106,11 +65,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    checkLogin();
+    getUser();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, refreshLogin }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, logout, refreshLogin }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { usePage } from "../../../App";
 import Itinerary from "./Itinerary";
+import { apiRequests } from "../functions/apiRequests";
 
 export default function CreateItinerary() {
   const { setPage } = usePage();
+  const { createItinerary } = apiRequests();
   const [newItinerary, setNewItinerary] = useState({
     title: "",
     startDate: "",
@@ -22,25 +24,13 @@ export default function CreateItinerary() {
   const handleCreate = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await fetch("http://localhost:5000/api/itineraries", {
-        method: "POST",
-        body: JSON.stringify(newItinerary),
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          "Content-Type": "application/json",
-        },
-      });
+    const res = await createItinerary(newItinerary);
+    const { response, data } = res;
 
-      const data = await response.json();
-
-      if (response.status === 201) {
-        setPage(<Itinerary id={data._id} />);
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      alert("Error uploading your itinerary");
+    if (response.ok) {
+      setPage(<Itinerary id={data._id} />);
+    } else {
+      alert(data.message);
     }
   };
 

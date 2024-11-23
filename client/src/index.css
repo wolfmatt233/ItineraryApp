@@ -27,6 +27,10 @@
     @apply border border-gray-300 w-[350px] p-3 flex flex-col absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] rounded-md;
   }
 
+  .form-modal {
+    @apply border border-gray-300 w-3/4 p-3 flex flex-col absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] rounded-md;
+  }
+
   .icon-button {
     @apply cursor-pointer text-xl w-7 h-7 flex items-center justify-evenly hover:bg-[#F7B733] hover:text-white rounded-md;
   }

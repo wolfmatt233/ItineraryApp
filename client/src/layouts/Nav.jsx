@@ -1,8 +1,5 @@
 import { useAuth } from "../context/AuthContext";
 import { usePage } from "../App";
-import Itineraries from "../features/itineraries/pages/Itineraries";
-import CreateItinerary from "../features/itineraries/pages/CreateItinerary";
-import User from "../features/auth/pages/User";
 
 export default function Nav() {
   const { user, logout } = useAuth();
@@ -16,13 +13,13 @@ export default function Nav() {
             <div className="h-full flex">
               <button
                 className="nav-button"
-                onClick={() => setPage(<Itineraries />)}
+                onClick={() => setPage("itineraries")}
               >
                 <i className="fa-solid fa-map mr-1"></i> Itineraries
               </button>
               <button
                 className="nav-button"
-                onClick={() => setPage(<CreateItinerary />)}
+                onClick={() => setPage("create-itinerary")}
               >
                 <i className="fa-solid fa-plus mr-1"></i> Create Itinerary
               </button>
@@ -30,7 +27,7 @@ export default function Nav() {
             <div className="flex">
               <button
                 className="nav-button px-4"
-                onClick={() => setPage(<User />)}
+                onClick={() => setPage("user")}
               >
                 <i className="fa-solid fa-user"></i>
               </button>

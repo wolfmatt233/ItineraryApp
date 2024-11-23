@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import { authRequests } from "./authRequests";
+import { authRequests } from "../requests/authRequests";
 
 const AuthContext = createContext();
 
@@ -16,11 +16,9 @@ export const AuthProvider = ({ children }) => {
     if (response.ok) {
       setInitLoad(false);
       setUser(data);
-      setLoading(false);
     } else if (response.status === 403) {
       // try to refresh expired token with a new one
       refreshLogin();
-      setLoading(false);
     }
   };
 
@@ -66,6 +64,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     getUser();
+    setLoading(false);
   }, []);
 
   return (

@@ -12,7 +12,7 @@ export const useItinerary = () => useContext(ItineraryContext);
 
 export default function Itinerary({ id }) {
   const { setPage } = usePage();
-  const { fetchItinerary } = apiRequests();
+  const { fetchItinerary, fetchActivities } = apiRequests();
   const [itinerary, setItinerary] = useState({});
   const [loading, setLoading] = useState(true);
   const [showMap, setShowMap] = useState(false);
@@ -22,9 +22,15 @@ export default function Itinerary({ id }) {
   const getItinerary = async () => {
     const res = await fetchItinerary(id);
     const { response, data } = res;
+    const res2 = await fetchActivities(id);
+
+    const combinedItinerary = {
+      ...data,
+      activities: res2.data,
+    };
 
     if (response.ok) {
-      setItinerary(data);
+      setItinerary(combinedItinerary);
       setLoading(false);
     } else {
       setPage("itineraries");
@@ -37,16 +43,12 @@ export default function Itinerary({ id }) {
   }, []);
 
   useEffect(() => {
-    let overflow = document.body.style.overflow;
-
-    if (activityId) overflow = "auto";
-
-    if (!showMap) {
-      overflow = "hidden";
+    if (activityId || showMap) {
+      document.body.style.overflow = "hidden";
     } else {
-      overflow = "auto";
+      document.body.style.overflow = "auto";
     }
-  }, [showMap]);
+  }, [activityId, showMap]);
 
   useEffect(() => {
     setActivityId(false);

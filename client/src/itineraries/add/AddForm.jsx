@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useItinerary } from "../../pages/itinerary/Itinerary";
 import { apiRequests } from "../../requests/apiRequests";
 import { removeTime } from "../functions/formatDate";
 
 export default function AddForm({ setLocation, location }) {
   const { id, itinerary, setItinerary, setShowMap } = useItinerary();
-  const { updateItinerary } = apiRequests();
+  const { createActivity } = apiRequests();
   const [newActivity, setNewActivity] = useState({
     date: "",
     activity: "",
@@ -16,7 +16,7 @@ export default function AddForm({ setLocation, location }) {
     completed: false,
   });
   const [datetime, setDatetime] = useState({
-    date: "",
+    date: itinerary.startDate.split("T")[0],
     time: "",
   });
   const [editToggle, setEditToggle] = useState(() => {
@@ -24,22 +24,18 @@ export default function AddForm({ setLocation, location }) {
   });
 
   const handleChange = (e) => {
-    let { name, value } = e.target;
+    let { name, value, type, checked } = e.target;
 
     if (name === "date" || name === "time") {
-      setDatetime((prev) => {
-        return {
-          ...prev,
-          [name]: value,
-        };
-      });
+      setDatetime((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     } else {
-      setNewActivity((prevData) => {
-        return {
-          ...prevData,
-          [name]: value,
-        };
-      });
+      setNewActivity((prevData) => ({
+        ...prevData,
+        [name]: type === "checkbox" ? checked : value,
+      }));
     }
   };
 
@@ -57,17 +53,17 @@ export default function AddForm({ setLocation, location }) {
       ...newActivity,
       date: `${date}T${time}:00`,
     };
+    console.log(date, time, activityWithTime);
 
-    const updatedItinerary = {
-      ...itinerary,
-      activities: [...itinerary.activities, activityWithTime],
-    };
-
-    const res = await updateItinerary(id, updatedItinerary);
+    const res = await createActivity(id, activityWithTime);
     const { response, data } = res;
 
     if (response.ok) {
-      setItinerary(data);
+      const updatedItinerary = {
+        ...itinerary,
+        activities: [...itinerary.activities, data],
+      };
+      setItinerary(updatedItinerary);
       handleClose();
     } else {
       alert("Failed to add activity.");
@@ -123,6 +119,7 @@ export default function AddForm({ setLocation, location }) {
             name="date"
             min={removeTime(itinerary.startDate)}
             max={removeTime(itinerary.endDate)}
+            value={datetime.date}
             className="basic-input"
             onChange={handleChange}
           />
@@ -140,6 +137,16 @@ export default function AddForm({ setLocation, location }) {
             className="basic-input"
             onChange={handleChange}
           />
+          <div>
+            <label htmlFor="completed">Completed</label>
+            <input
+              type="checkbox"
+              name="completed"
+              className="ml-2"
+              checked={newActivity.completed}
+              onChange={handleChange}
+            />
+          </div>
           <label htmlFor="notes">Notes</label>
           <textarea
             name="notes"

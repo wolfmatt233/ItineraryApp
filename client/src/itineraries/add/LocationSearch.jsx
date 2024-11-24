@@ -58,25 +58,25 @@ export default function LocationSearch({
           <i className="fa-solid fa-magnifying-glass"></i>
         </button>
       </form>
-      {results.length > 0 && (
-        <div className="w-[273px] absolute bg-white max-h-40 left-3 top-16 z-[1000] rounded-t-md">
-          <p
-            className={`${
-              toggleLocations ? "rounded-t-md" : "rounded-sm"
-            } list-title`}
-            onClick={() => setToggleLocations((prev) => !prev)}
-          >
-            Locations
-            <i
-              className={`fa-solid fa-caret-${
-                toggleLocations ? "up mt-1" : "down"
-              } ml-2 mr-1`}
-            ></i>
-          </p>
-          {toggleLocations && (
-            <>
-              <div className="overflow-x-hidden flex flex-col bg-white max-h-96">
-                {results.map((location, idx) => {
+      <div className="w-[273px] absolute bg-white max-h-40 left-3 top-16 z-[1000] rounded-t-md">
+        <p
+          className={`${
+            toggleLocations ? "rounded-t-md" : "rounded-sm"
+          } list-title`}
+          onClick={() => setToggleLocations((prev) => !prev)}
+        >
+          Locations
+          <i
+            className={`fa-solid fa-caret-${
+              toggleLocations ? "up mt-1" : "down"
+            } ml-2 mr-1`}
+          ></i>
+        </p>
+        {toggleLocations && (
+          <>
+            <div className="overflow-x-hidden flex flex-col bg-white max-h-96">
+              {results.length > 0 ? (
+                results.map((location, idx) => {
                   let addressNames = location.display_name.split(",");
                   let name = "";
 
@@ -96,21 +96,25 @@ export default function LocationSearch({
                       {name}, <b>{location.address.country}</b>
                     </button>
                   );
-                })}
-              </div>
-              <button
-                className="site-green text-white p-2 text-left w-full flex items-center justify-between hover:site-yellow rounded-b-md"
-                onClick={() => {
-                  setLocation("none");
-                }}
-              >
-                Continue without a location
-                <i className="fa-solid fa-right-long"></i>
-              </button>
-            </>
-          )}
-        </div>
-      )}
+                })
+              ) : (
+                <div className="hover:bg-gray-200 border-b p-1 text-left">
+                  No results, search for a location!
+                </div>
+              )}
+            </div>
+            <button
+              className="site-green text-white p-2 text-left w-full flex items-center justify-between hover:site-yellow rounded-b-md"
+              onClick={() => {
+                setLocation("none");
+              }}
+            >
+              Continue without a location
+              <i className="fa-solid fa-right-long"></i>
+            </button>
+          </>
+        )}
+      </div>
     </>
   );
 }

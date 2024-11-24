@@ -28,7 +28,7 @@
   }
 
   .form-modal {
-    @apply border border-gray-300 w-3/4 p-3 flex flex-col absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] rounded-md;
+    @apply border border-gray-300 w-3/4 p-3 flex flex-col absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] rounded-md max-h-[calc(100vh-100px)] overflow-auto;
   }
 
   .icon-button {

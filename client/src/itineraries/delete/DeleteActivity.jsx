@@ -5,21 +5,20 @@ import { useActivity } from "../view/Activities";
 export default function DeleteActivity({ modal }) {
   const { itinerary, setItinerary } = useItinerary();
   const { setModal } = useActivity();
-  const { updateItinerary } = apiRequests();
+  const { deleteActivity } = apiRequests();
 
   const handleDelete = async (e) => {
     e.preventDefault();
 
-    const newActivities = itinerary.activities.filter(
-      (item) => item._id !== modal
-    );
-
-    const updatedItinerary = { ...itinerary, activities: newActivities };
-
-    const res = await updateItinerary(itinerary._id, updatedItinerary);
+    const res = await deleteActivity(modal);
     const { response, data } = res;
 
     if (response.ok) {
+      const newActivities = itinerary.activities.filter(
+        (item) => item._id !== modal
+      );
+
+      const updatedItinerary = { ...itinerary, activities: newActivities };
       setItinerary(updatedItinerary);
       setModal(false);
     } else {

@@ -5,7 +5,7 @@ import { removeTime } from "../functions/formatDate";
 
 export default function EditActivity({ activityId, setActivityId }) {
   const { id, itinerary, setItinerary } = useItinerary();
-  const { updateItinerary } = apiRequests();
+  const { updateActivity } = apiRequests();
   const [updatedActivity, setUpdatedActivity] = useState(
     itinerary.activities.filter((activity) => activity._id === activityId)[0]
   );
@@ -16,9 +16,14 @@ export default function EditActivity({ activityId, setActivityId }) {
   const [editToggle, setEditToggle] = useState(false);
 
   const handleChange = (e) => {
-    let { name, value } = e.target;
+    let { name, value, checked, type } = e.target;
 
-    if (name === "date" || name === "time") {
+    if (type === "checkbox") {
+      setUpdatedActivity((prevData) => ({
+        ...prevData,
+        [name]: checked,
+      }));
+    } else if (name === "date" || name === "time") {
       setDatetime((prev) => {
         return {
           ...prev,
@@ -43,27 +48,20 @@ export default function EditActivity({ activityId, setActivityId }) {
       date: `${datetime.date}T${datetime.time}:00`,
     };
 
-    const updatedItinerary = {
-      ...itinerary,
-      activities: itinerary.activities.map((activity) =>
-        activity._id === activityId ? activityWithTime : activity
-      ),
-    };
-
-    console.log(updatedItinerary);
-
-    const res = await updateItinerary(id, updatedItinerary);
+    const res = await updateActivity(activityWithTime);
     const { response, data } = res;
 
     if (response.ok) {
-      setItinerary(data);
-      handleClose();
-    }
-  };
+      const updatedItinerary = {
+        ...itinerary,
+        activities: itinerary.activities.map((activity) =>
+          activity._id === activityId ? data : activity
+        ),
+      };
 
-  const handleClose = (e) => {
-    setActivityId(false);
-    setShowMap(true);
+      setItinerary(updatedItinerary);
+      setActivityId(false);
+    }
   };
 
   return (
@@ -135,6 +133,16 @@ export default function EditActivity({ activityId, setActivityId }) {
             onChange={handleChange}
             value={updatedActivity.activity}
           />
+          <div>
+            <label htmlFor="completed">Completed</label>
+            <input
+              type="checkbox"
+              name="completed"
+              className="ml-2"
+              checked={updatedActivity.completed}
+              onChange={handleChange}
+            />
+          </div>
           <label htmlFor="notes">Notes</label>
           <textarea
             name="notes"

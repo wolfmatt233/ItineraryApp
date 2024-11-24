@@ -39,7 +39,7 @@ export default function ActivityList({ activities }) {
           {toggleLocations && (
             <div className="overflow-x-hidden flex flex-col bg-white max-h-[350px]">
               {activities.map((activity, idx) => {
-                const currentDate = activity.date.split(" ")[0];
+                const currentDate = activity.date.split("T")[0];
                 const showHeader = currentDate !== lastDate;
                 lastDate = currentDate;
 

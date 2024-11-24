@@ -11,14 +11,11 @@ export default function AddActivity() {
   const clusterGroupRef = useRef();
 
   useEffect(() => {
-    if (!location) {
+    if (location) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
     }
-    return () => {
-      document.body.style.overflow = "auto";
-    };
   }, [location]);
 
   return (

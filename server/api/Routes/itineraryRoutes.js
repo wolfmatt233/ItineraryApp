@@ -3,11 +3,11 @@ import authMiddleware from "../Middleware/authMiddleware.js";
 import Itinerary from "../Models/Itinerary.js";
 import paginate from "../Utils/pagination.js";
 import { hasEmptyInputs } from "../Utils/emptyInputs.js";
-import mongoose from "mongoose";
+import Activity from "../Models/Activity.js";
 
 const router = Router();
 
-// CRUD Operations
+// Itineraries CRUD
 
 router.get("/", authMiddleware, async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
@@ -59,8 +59,8 @@ router.post("/", authMiddleware, async (req, res) => {
     const newItinerary = new Itinerary({
       userId: req.user.id,
       title,
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
+      startDate,
+      endDate,
     });
 
     await newItinerary.save();
@@ -92,12 +92,11 @@ router.patch("/:id", authMiddleware, async (req, res) => {
 
     // Update itinerary, only if new value is provided
     itinerary.title = title || itinerary.title;
-    itinerary.startDate = new Date(startDate) || itinerary.startDate;
-    itinerary.endDate = new Date(endDate) || itinerary.endDate;
+    itinerary.startDate = startDate || itinerary.startDate;
+    itinerary.endDate = endDate || itinerary.endDate;
     itinerary.activities = activities || itinerary.activities;
     itinerary.notes = notes || itinerary.notes;
     itinerary.completed = completed || itinerary.compeleted;
-    itinerary.updatedAt = new Date();
 
     const updatedItinerary = await itinerary.save();
 
@@ -127,6 +126,53 @@ router.delete("/:id", authMiddleware, async (req, res) => {
   } catch (error) {
     console.log("ERROR", error);
     res.status(500).json({ message: "Error deleting itinerary" });
+  }
+});
+
+// Activities via Itinerary id: read and create
+
+router.get("/:id/activities", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const activities = await Activity.find({
+      userId: req.user.id,
+      itineraryId: id,
+    });
+
+    res.status(200).json(activities);
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving activities" });
+  }
+});
+
+router.post("/:id/activities", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { date, activity, locationName, locationLat, locationLon, notes } =
+    req.body;
+
+  if (hasEmptyInputs(req.body)) {
+    return res.status(400).json({ message: "All fields must be completed." });
+  }
+
+  try {
+    const newActivity = new Activity({
+      userId: req.user.id,
+      itineraryId: id,
+      date,
+      activity,
+      locationName,
+      locationLat,
+      locationLon,
+      notes,
+      completed: false,
+    });
+
+    await newActivity.save();
+
+    res.status(201).json(newActivity);
+  } catch (error) {
+    res.status(500).json({ message: "Error creating activity" });
   }
 });
 

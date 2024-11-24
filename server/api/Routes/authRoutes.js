@@ -9,7 +9,7 @@ const router = Router();
 router.get("/user", authMiddleware, async (req, res) => {
   try {
     // Find the user
-    const user = await User.findById(req.user.id).select("-password -refreshToken -__v -itineraries");
+    const user = await User.findById(req.user.id);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -120,50 +120,6 @@ router.post("/register", async (req, res) => {
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error registering user" });
-  }
-});
-
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    // Find user
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
-
-    // Compare passwords
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
-
-    // Generate JWT (short term)
-    const token = jwt.sign(
-      { id: user.id, username: user.username },
-      process.env.JWT_SECRET,
-      { expiresIn: "1hr" }
-    );
-
-    // Generate refresh token (long term)
-    const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-
-    // Save refresh to user document
-    user.refreshToken = refreshToken;
-    await user.save();
-
-    res.json({
-      accessToken: token,
-      refreshToken: refreshToken,
-      message: "Logged in successfully",
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Error logging in" });
   }
 });
 

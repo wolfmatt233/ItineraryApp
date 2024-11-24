@@ -24,7 +24,7 @@ export const authRequests = () => {
 
     try {
       // Refresh the access token using the refresh token
-      const response = await fetch(`${apiUrl}/api/auth/refresh-token`, {
+      const response = await fetch(`${apiUrl}/auth/refresh-token`, {
         method: "POST",
         headers: {
           Authorization: JSON.stringify({

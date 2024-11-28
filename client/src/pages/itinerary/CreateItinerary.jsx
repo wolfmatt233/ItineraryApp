@@ -27,7 +27,7 @@ export default function CreateItinerary() {
     const { response, data } = res;
 
     if (response.ok) {
-      setPage(`itinerary:${data.id}`);
+      setPage(`itinerary:${data._id}`);
     } else {
       alert(data.message);
     }

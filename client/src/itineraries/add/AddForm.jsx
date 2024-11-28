@@ -53,7 +53,6 @@ export default function AddForm({ setLocation, location }) {
       ...newActivity,
       date: `${date}T${time}:00`,
     };
-    console.log(date, time, activityWithTime);
 
     const res = await createActivity(id, activityWithTime);
     const { response, data } = res;

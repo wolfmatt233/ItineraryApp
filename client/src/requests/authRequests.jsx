@@ -30,11 +30,7 @@ export const authRequests = () => {
           Authorization: JSON.stringify({
             refreshToken: refreshToken,
           }),
-          "Content-Type": "application/json", //TODO: fix in back end, retrieve from header not body
         },
-        body: JSON.stringify({
-          refreshToken: refreshToken,
-        }),
       });
 
       const data = await response.json();

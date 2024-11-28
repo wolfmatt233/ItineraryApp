@@ -66,7 +66,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/refresh-token", async (req, res) => {
-  const { refreshToken } = req.body;
+  const refreshToken = req.header("Authorization")?.split(" ")[1];
 
   if (!refreshToken) {
     return res.status(401).json({ message: "Refresh token is required" });

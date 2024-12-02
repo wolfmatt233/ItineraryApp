@@ -13,8 +13,8 @@ An itenerary website that allows you to create an itenerary on a day by day basi
 
 ## Other Tech & Libraries
 
-- Google Maps API OR Leaflet Maps API (open source)
-- React Big Calender (free) OR FullCalendar (free w/ some features locked behind paywall)
+- Leaflet Maps API (open source)
+- TODO: React Big Calender (free) OR FullCalendar (free w/ some features locked behind paywall)
 
 ## Database
 
@@ -78,7 +78,7 @@ An itenerary website that allows you to create an itenerary on a day by day basi
 
   - [x] Update Title and dates
   - [x] Update activities
-    - [ ] Mark as complete
+    - [x] Mark as complete
 
 - [x] Delete Itinerary
 
@@ -94,6 +94,10 @@ An itenerary website that allows you to create an itenerary on a day by day basi
     - [x] Completed activities grayed out
   - [ ] View activities in a calendar view
     - [ ] Export activities to external calendar applications
+
+## PHP Api
+
+- Added a PHP version of the api for my own practice that works the same, just using MySQL.
 
 ## Possible Features (uncertain)
 

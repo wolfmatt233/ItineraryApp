@@ -4,238 +4,183 @@ import { useAuth } from "../context/AuthContext";
 export const apiRequests = () => {
   const { setPageLoading } = usePage();
   const { refreshLogin } = useAuth();
+  const authHeader = `Bearer ${localStorage.getItem("accessToken")}`;
   const apiUrl = import.meta.env.VITE_API_URL;
+
+  // If 404, try refreshing token, if not complete the given request
+
+  const retryForbidden = async (fetchFunction, args, hasRefreshed = false) => {
+    // if id and _id exist, remove _id (for PHP api)
+    args.forEach((arg) => {
+      if (typeof arg === "object") {
+        if (arg.id && arg._id) {
+          delete arg._id;
+        }
+      }
+    });
+
+    try {
+      const response = await fetchFunction(...args);
+      const data = await response.json();
+
+      if (response.status === 403 && !hasRefreshed) {
+        await refreshLogin();
+        return retryForbidden(fetchFunction, [...args], true);
+      }
+
+      setPageLoading(false);
+
+      return { response, data: addUnderscoreId(data) };
+    } catch (error) {
+      setPageLoading(false);
+      console.log(error);
+    }
+  };
+
+  //add _id for client reading (PHP api)
+
+  const addUnderscoreId = (data) => {
+    if (Array.isArray(data)) {
+      // If it's an array, apply recursively to each item
+      return data.map(addUnderscoreId);
+    } else if (typeof data === "object" && data !== null) {
+      // If it's an object, add `_id` and recurse
+      const transformed = {};
+      for (const key in data) {
+        const value = data[key];
+        transformed[key] = addUnderscoreId(value); // Recurse for nested data
+      }
+      // Add `_id` if `id` exists and `_id` doesn't
+      if (data.id && !data._id) {
+        transformed["_id"] = data.id;
+      }
+      return transformed;
+    }
+    // Return primitive values unchanged
+    return data;
+  };
 
   // Itinerary CRUD api calls
 
-  const createItinerary = async (itinerary, hasRefreshed = false) => {
+  const createItinerary = async (itinerary) => {
     setPageLoading(true);
-    try {
-      const response = await fetch(`${apiUrl}/itineraries`, {
+    const fetchFunction = async (itinerary) =>
+      fetch(`${apiUrl}/itineraries`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: authHeader,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(itinerary),
       });
 
-      const data = await response.json();
-
-      if (response.status === 403 && !hasRefreshed) {
-        await refreshLogin();
-        return createItinerary(itinerary, true);
-      }
-
-      setPageLoading(false);
-      return { response: response, data: data };
-    } catch (error) {
-      setPageLoading(false);
-      console.log(error);
-      alert("Request failed.");
-    }
+    return retryForbidden(fetchFunction, [itinerary]);
   };
 
-  const fetchItineraries = async (hasRefreshed = false) => {
-    try {
-      const response = await fetch(`${apiUrl}/itineraries`, {
+  const fetchItineraries = async () => {
+    const fetchFunction = async () =>
+      fetch(`${apiUrl}/itineraries`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: authHeader,
         },
       });
 
-      const data = await response.json();
-
-      if (response.status === 403 && !hasRefreshed) {
-        await refreshLogin();
-        return fetchItineraries(true);
-      }
-
-      return { response: response, data: data };
-    } catch (error) {
-      console.log(error);
-      alert("Request failed.");
-    }
+    return retryForbidden(fetchFunction, []);
   };
 
-  const fetchItinerary = async (id, hasRefreshed = false) => {
-    try {
-      const response = await fetch(`${apiUrl}/itineraries/${id}`, {
+  const fetchItinerary = async (id) => {
+    const fetchFunction = (id) =>
+      fetch(`${apiUrl}/itineraries/${id}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: authHeader,
         },
       });
 
-      const data = await response.json();
-
-      if (response.status === 403 && !hasRefreshed) {
-        await refreshLogin();
-        return fetchItinerary(id, true);
-      }
-
-      return { response: response, data: data };
-    } catch (error) {
-      console.log(error);
-      alert("Request failed.");
-    }
+    return retryForbidden(fetchFunction, [id]);
   };
 
-  const updateItinerary = async (id, itinerary, hasRefreshed = false) => {
+  const updateItinerary = async (id, itinerary) => {
     setPageLoading(true);
-    try {
-      const response = await fetch(`${apiUrl}/itineraries/${id}`, {
+    const fetchFunction = (id, itinerary) =>
+      fetch(`${apiUrl}/itineraries/${id}`, {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: authHeader,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(itinerary),
       });
 
-      const data = await response.json();
-
-      if (response.status === 403 && !hasRefreshed) {
-        await refreshLogin();
-        return updateItinerary(id, itinerary, true);
-      }
-
-      setPageLoading(false);
-      return { response: response, data: data };
-    } catch (error) {
-      setPageLoading(false);
-      console.log(error);
-      console.log("help", error.message);
-      alert("Request failed.");
-    }
+    return retryForbidden(fetchFunction, [id, itinerary]);
   };
 
-  const deleteItinerary = async (id, hasRefreshed = false) => {
+  const deleteItinerary = async (id) => {
     setPageLoading(true);
-    try {
-      const response = await fetch(`${apiUrl}/itineraries/${id}`, {
+    const fetchFunction = (id) =>
+      fetch(`${apiUrl}/itineraries/${id}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: authHeader,
         },
       });
 
-      const data = await response.json();
-
-      if (response.status === 403 && !hasRefreshed) {
-        await refreshLogin();
-        return deleteItinerary(id, true);
-      }
-
-      setPageLoading(false);
-      return { response: response, data: data };
-    } catch (error) {
-      setPageLoading(false);
-      console.log(error);
-      alert("Request failed.");
-    }
+    return retryForbidden(fetchFunction, [id]);
   };
 
   // Activities CRUD api calls
 
-  const createActivity = async (id, activity, hasRefreshed = false) => {
+  const createActivity = async (id, activity) => {
     setPageLoading(true);
-    try {
-      const response = await fetch(`${apiUrl}/itineraries/${id}/activities`, {
+    const fetchFunction = (id, activity) =>
+      fetch(`${apiUrl}/activities/${id}`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: authHeader,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(activity),
       });
 
-      const data = await response.json();
-
-      if (response.status === 403 && !hasRefreshed) {
-        await refreshLogin();
-        return createActivity(id, activity, true);
-      }
-
-      setPageLoading(false);
-      return { response: response, data: data };
-    } catch (error) {
-      setPageLoading(false);
-      console.log(error);
-      alert("Request failed.");
-    }
+    return retryForbidden(fetchFunction, [id, activity]);
   };
 
-  const updateActivity = async (activity, hasRefreshed = false) => {
+  const fetchActivities = async (id) => {
+    const fetchFunction = (id) =>
+      fetch(`${apiUrl}/itineraries/${id}/activities`, {
+        headers: {
+          Authorization: authHeader,
+        },
+      });
+
+    return retryForbidden(fetchFunction, [id]);
+  };
+
+  const updateActivity = async (id, activity) => {
     setPageLoading(true);
-    try {
-      const response = await fetch(`${apiUrl}/activities/${activity._id}`, {
+    const fetchFunction = (id, activity) =>
+      fetch(`${apiUrl}/activities/${id}`, {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: authHeader,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(activity),
       });
 
-      const data = await response.json();
-
-      if (response.status === 403 && !hasRefreshed) {
-        await refreshLogin();
-        return updateActivity(activity, true);
-      }
-
-      setPageLoading(false);
-      return { response: response, data: data };
-    } catch (error) {
-      setPageLoading(false);
-      console.log(error);
-      alert("Request failed.");
-    }
+    return retryForbidden(fetchFunction, [id, activity]);
   };
 
-  const fetchActivities = async (id, hasRefreshed = false) => {
-    try {
-      const response = await fetch(`${apiUrl}/itineraries/${id}/activities`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
-
-      const data = await response.json();
-
-      if (response.status === 403 && !hasRefreshed) {
-        await refreshLogin();
-        return fetchActivities(id, true);
-      }
-
-      return { response: response, data: data };
-    } catch (error) {
-      console.log(error);
-      alert("Request failed.");
-    }
-  };
-
-  const deleteActivity = async (id, hasRefreshed = false) => {
-    try {
-      const response = await fetch(`${apiUrl}/activities/${id}`, {
+  const deleteActivity = async (id) => {
+    setPageLoading(true);
+    const fetchFunction = (id) =>
+      fetch(`${apiUrl}/activities/${id}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: authHeader,
         },
       });
 
-      const data = await response.json();
-
-      if (response.status === 403 && !hasRefreshed) {
-        await refreshLogin();
-        return deleteActivity(id, true);
-      }
-
-      return { response: response, data: data };
-    } catch (error) {
-      console.log(error);
-      alert("Request failed.");
-    }
+    return retryForbidden(fetchFunction, [id]);
   };
 
   return {

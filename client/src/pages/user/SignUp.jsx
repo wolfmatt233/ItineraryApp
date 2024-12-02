@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { usePage } from "../../App";
 import { useAuth } from "../../context/AuthContext";
+import { authRequests } from "../../requests/authRequests";
 
 export default function SignUp() {
   const { login } = useAuth();
+  const { fetchSignup } = authRequests();
   const { setPage } = usePage();
   const [formData, setFormData] = useState({
     email: "",
@@ -22,25 +24,12 @@ export default function SignUp() {
   const signUp = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+    const { response, data } = await fetchSignup(formData);
 
-      const data = await response.json();
-
-      if (response.status === 201) {
-        login(formData);
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      console.log(error);
-      alert("Registration failed");
+    if (response.ok) {
+      await login(formData);
+    } else {
+      alert("Sign up failed");
     }
   };
 

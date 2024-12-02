@@ -15,7 +15,7 @@ export const authRequests = () => {
 
       return { response, data };
     } catch (error) {
-      console.log("Request failed: ", error);
+      console.log(error);
     }
   };
 
@@ -27,9 +27,7 @@ export const authRequests = () => {
       const response = await fetch(`${apiUrl}/auth/refresh-token`, {
         method: "POST",
         headers: {
-          Authorization: JSON.stringify({
-            refreshToken: refreshToken,
-          }),
+          Authorization: `Bearer ${refreshToken}`,
         },
       });
 
@@ -37,7 +35,25 @@ export const authRequests = () => {
 
       return { response, data };
     } catch (error) {
-      console.log("Request failed: ", error);
+      console.log(error);
+    }
+  };
+
+  const fetchSignup = async (formData) => {
+    try {
+      const response = await fetch(`${apiUrl}/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      return { response, data };
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -55,9 +71,9 @@ export const authRequests = () => {
 
       return { response, data };
     } catch (error) {
-      console.log("Request failed: ", error);
+      console.log(error);
     }
   };
 
-  return { fetchUser, tokenRefresh, fetchLogin };
+  return { fetchUser, tokenRefresh, fetchSignup, fetchLogin };
 };

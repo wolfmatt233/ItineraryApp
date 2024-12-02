@@ -37,9 +37,8 @@ export default function App() {
 
   return (
     <PageContext.Provider value={{ page, setPage, setPageLoading }}>
-      {pageLoading && <Loading />}
-
       <Nav />
+      {pageLoading && <Loading />}
       {page === "itineraries" ? (
         <Itineraries />
       ) : page === "login" ? (

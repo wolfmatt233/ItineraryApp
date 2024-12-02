@@ -7,6 +7,36 @@ const router = Router();
 
 // Activity: read, update, delete
 
+router.post("/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { date, activity, locationName, locationLat, locationLon, notes } =
+    req.body;
+
+  if (hasEmptyInputs(req.body)) {
+    return res.status(400).json({ message: "All fields must be completed." });
+  }
+
+  try {
+    const newActivity = new Activity({
+      userId: req.user.id,
+      itineraryId: id,
+      date,
+      activity,
+      locationName,
+      locationLat,
+      locationLon,
+      notes,
+      completed: false,
+    });
+
+    await newActivity.save();
+
+    res.status(201).json(newActivity);
+  } catch (error) {
+    res.status(500).json({ message: "Error creating activity" });
+  }
+});
+
 router.get("/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
 

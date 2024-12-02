@@ -10,8 +10,7 @@ export const AuthProvider = ({ children }) => {
   const { fetchUser, tokenRefresh, fetchLogin } = authRequests();
 
   const getUser = async () => {
-    const res = await fetchUser();
-    const { response, data } = res;
+    const { response, data } = await fetchUser();
 
     if (response.ok) {
       setInitLoad(false);
@@ -50,7 +49,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
 
-      getUser();
+      await getUser();
     } else {
       alert("Invalid credentials");
     }

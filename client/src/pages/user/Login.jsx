@@ -25,7 +25,7 @@ export default function Login() {
 
   return (
     <div className="page-layout">
-      <form className="basic-input login-modal">
+      <form className="w-[350px] bg-white modal">
         <p className="text-center text-lg">Login</p>
         <label htmlFor="email">Email</label>
         <input

@@ -28,7 +28,7 @@ export default function ActivityMap({ activities }) {
 
   return (
     <MapContainer
-      className="w-full h-[500px]"
+      className="h-[55vh] w-full"
       zoom={3}
       center={bounds.length > 0 ? bounds[0] : [0, 0]}
       scrollWheelZoom={false}

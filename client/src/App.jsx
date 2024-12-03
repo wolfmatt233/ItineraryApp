@@ -8,8 +8,9 @@ import SignUp from "./pages/user/SignUp";
 import Itineraries from "./pages/itinerary/Itineraries";
 import CreateItinerary from "./pages/itinerary/CreateItinerary";
 import Itinerary from "./pages/itinerary/Itinerary";
-import Loading from "./layouts/Loading";
+import LoadingModal from "./layouts/LoadingModal";
 import Error from "./pages/Error";
+import Loading from "./layouts/Loading";
 
 const PageContext = createContext();
 export const usePage = () => useContext(PageContext);
@@ -27,18 +28,14 @@ export default function App() {
     }
   }, [user]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <i className="fas fa-circle-notch fa-spin text-5xl text-black"></i>
-      </div>
-    );
-  }
+  if (loading) return <Loading />;
 
   return (
     <PageContext.Provider value={{ page, setPage, setPageLoading }}>
+      {pageLoading && <LoadingModal />}
+
       <Nav />
-      {pageLoading && <Loading />}
+
       {page === "itineraries" ? (
         <Itineraries />
       ) : page === "login" ? (
@@ -54,6 +51,7 @@ export default function App() {
       ) : page.split(":")[0] === "error" ? (
         <Error error={page.split(":")[1]} />
       ) : null}
+      
       <Footer />
     </PageContext.Provider>
   );

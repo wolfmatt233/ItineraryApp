@@ -19,9 +19,7 @@ export default function ActivityList({ activities }) {
   return (
     <>
       {activities.length > 0 && (
-        <div
-          className={`w-[273px] absolute bg-white max-h-[480px] left-3 top-[10px] z-[1000] rounded-md`}
-        >
+        <div className="max-sm:left-6 w-[273px] absolute bg-white left-3 top-3 z-[1000] rounded-md">
           <p
             className={`p-1 ${
               toggleLocations ? "rounded-t-md" : "rounded-md"
@@ -37,7 +35,7 @@ export default function ActivityList({ activities }) {
           </p>
 
           {toggleLocations && (
-            <div className="overflow-x-hidden flex flex-col bg-white max-h-[350px]">
+            <div className="overflow-x-hidden flex flex-col bg-white max-h-[calc(55vh-60px)]">
               {activities.map((activity, idx) => {
                 const currentDate = activity.date.split("T")[0];
                 const showHeader = currentDate !== lastDate;
@@ -73,3 +71,5 @@ export default function ActivityList({ activities }) {
     </>
   );
 }
+
+// max-h-[440px]

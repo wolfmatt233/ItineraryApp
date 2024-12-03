@@ -41,99 +41,87 @@ export default function EditInfo() {
   return (
     <>
       <div className="page-title items-center">
-        {edit ? (
-          <>
-            <div className="w-full mr-2">
-              <label htmlFor="title">Title</label>
-              <input
-                type="text"
-                name="title"
-                value={updatedItinerary.title}
-                className="basic-input w-full mr-2"
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex mt-4">
+        <div className="w-full mr-2">
+          {edit && <label htmlFor="title">Title</label>}
+          <input
+            disabled={edit ? false : true}
+            type="text"
+            name="title"
+            value={updatedItinerary.title}
+            className={
+              edit ? "basic-input w-full" : "text-lg bg-transparent w-full"
+            }
+            onChange={handleChange}
+          />
+        </div>
+        <div className="flex">
+          {edit ? (
+            <>
               <i
-                className="fa-solid fa-xmark icon-button mr-1"
+                className="fa-solid fa-xmark icon-button mr-1 mt-4"
                 onClick={cancelEdit}
               ></i>
               <i
-                className="fa-solid fa-floppy-disk icon-button"
+                className="fa-solid fa-floppy-disk icon-button mt-4"
                 onClick={handleSave}
               ></i>
-            </div>
-          </>
-        ) : (
-          <>
-            <p className="text-lg">{itinerary.title}</p>
+            </>
+          ) : (
             <i
               className="fa-solid fa-pen-to-square icon-button"
               onClick={() => setEdit((prev) => !prev)}
             ></i>
-          </>
-        )}
+          )}
+        </div>
       </div>
 
-      <div className="flex flex-wrap items-center">
-        {edit ? (
-          <>
-            {/* Start Date */}
-            <div className="flex flex-col mr-2">
-              <p>
-                Start Date{" "}
-                <span className="text-sm text-gray-500">(editing)</span>
-              </p>
-              <input
-                type="date"
-                name="startDate"
-                value={removeTime(updatedItinerary.startDate)}
-                onChange={handleChange}
-                className="mb-2 size-fit bg-gray-300 p-2 rounded-md"
-              />
-            </div>
+      <div className="flex items-center max-sm:px-2 mb-4">
+        {/* Start Date */}
+        <div className="flex flex-col mr-2">
+          <p>
+            Start Date{" "}
+            {edit && <span className="text-sm text-gray-500">(editing)</span>}
+          </p>
+          <div className="flex site-green text-white rounded-md p-2 size-fit items-center justify-center">
+            <input
+              disabled={edit ? false : true}
+              type="date"
+              name="startDate"
+              value={removeTime(updatedItinerary.startDate)}
+              onChange={handleChange}
+              className="site-green"
+            />
+            {!edit && <i className="fa-regular fa-calendar ml-1"></i>}
+          </div>
+        </div>
 
-            {/* End Date */}
-            <div className="flex flex-col">
-              <p>
-                End Date{" "}
-                <span className="text-sm text-gray-500">(editing)</span>
-              </p>
-              <input
-                type="date"
-                name="endDate"
-                value={removeTime(updatedItinerary.endDate)}
-                onChange={handleChange}
-                className="mb-2 size-fit bg-gray-300 p-2 rounded-md"
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="flex flex-col mr-2">
-              <p>Start Date</p>
-              <p className="mb-2 size-fit site-green text-white p-2 rounded-md">
-                {formatDate(updatedItinerary.startDate)}{" "}
-                <i className="fa-regular fa-calendar"></i>
-              </p>
-            </div>
-            <div className="flex flex-col">
-              <p>End Date</p>
-              <p className="mb-2 size-fit site-green text-white p-2 rounded-md">
-                {formatDate(updatedItinerary.endDate)}{" "}
-                <i className="fa-regular fa-calendar"></i>
-              </p>
-            </div>
-          </>
+        {/* End Date */}
+        <div className="flex flex-col mr-2">
+          <p>
+            End Date{" "}
+            {edit && <span className="text-sm text-gray-500">(editing)</span>}
+          </p>
+          <div className="flex site-green text-white rounded-md p-2 size-fit items-center justify-center">
+            <input
+              disabled={edit ? false : true}
+              type="date"
+              name="endDate"
+              value={removeTime(updatedItinerary.endDate)}
+              onChange={handleChange}
+              className="site-green"
+            />
+            {!edit && <i className="fa-regular fa-calendar ml-1"></i>}
+          </div>
+        </div>
+
+        {showCalendar && (
+          <button
+            className="site-green size-fit text-white flex items-center rounded-md mt-6 px-3 h-[40px] hover:site-yellow"
+            onClick={() => setShowCalendar((prev) => !prev)}
+          >
+            <i class="fa-solid fa-map-location"></i>
+          </button>
         )}
-
-        <button
-          className="site-green size-fit text-white flex items-center rounded-md p-2 mt-4 hover:site-yellow ml-2"
-          onClick={() => setShowCalendar((prev) => !prev)}
-        >
-          {!showCalendar ? "Show Calendar" : "Show Map"}{" "}
-          <i className="fa-solid fa-eye ml-2"></i>
-        </button>
       </div>
     </>
   );

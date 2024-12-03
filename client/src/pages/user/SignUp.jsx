@@ -35,7 +35,7 @@ export default function SignUp() {
 
   return (
     <div className="page-layout">
-      <form className="login-modal">
+      <form className="w-[350px] bg-white modal">
         <p className="text-center text-lg">Sign Up</p>
         <label htmlFor="name">Username</label>
         <input
@@ -60,7 +60,7 @@ export default function SignUp() {
         />
         <button
           type="submit"
-          className="basic-button basic-input"
+          className="basic-button"
           onClick={signUp}
         >
           Sign Up

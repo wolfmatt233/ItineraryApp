@@ -3,45 +3,7 @@
 @tailwind utilities;
 
 @layer components {
-  .basic-input {
-    @apply border border-gray-300 p-1 mb-2;
-  }
-
-  .basic-button {
-    @apply bg-[#4ABDAC] hover:bg-[#F7B733] p-1 mb-2 text-white hover:border-transparent rounded-md mt-3;
-  }
-
-  .link-button {
-    @apply text-blue-500 hover:underline mt-1;
-  }
-
-  .nav-button {
-    @apply text-lg hover:bg-[#F7B733] px-2;
-  }
-
-  .page-layout {
-    @apply max-w-6xl mx-auto px-4 min-h-[calc(100vh-104px)];
-  }
-
-  .login-modal {
-    @apply border border-gray-300 w-[350px] p-3 flex flex-col absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] rounded-md;
-  }
-
-  .form-modal {
-    @apply border border-gray-300 w-3/4 p-3 flex flex-col absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] rounded-md max-h-[calc(100vh-100px)] overflow-auto;
-  }
-
-  .icon-button {
-    @apply cursor-pointer text-xl w-7 h-7 flex items-center justify-evenly hover:bg-[#F7B733] hover:text-white rounded-md;
-  }
-
-  .page-title {
-    @apply max-sm:-mx-4 max-sm:px-2 py-2 border-b mb-3 flex justify-between items-end;
-  }
-
-  .map-marker {
-    @apply bg-[#007bff]  rounded-full text-white font-bold flex justify-center items-center;
-  }
+  /* Universal classes */
 
   .site-green {
     @apply bg-[#4ABDAC];
@@ -49,6 +11,60 @@
 
   .site-yellow {
     @apply bg-[#F7B733];
+  }
+
+  .site-red {
+    @apply bg-[#fc4a1a];
+  }
+
+  /* General Page Items */
+
+  .nav-button {
+    @apply text-lg hover:bg-[#F7B733] px-2;
+  }
+
+  .page-layout {
+    @apply max-w-6xl mx-auto px-4 max-sm:px-0 min-h-[calc(100vh-104px)];
+  }
+
+  .page-title {
+    @apply max-sm:px-2 py-2 border-b mb-3 flex justify-between items-end;
+  }
+
+  .modal {
+    @apply border border-gray-300 p-3 flex flex-col absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] rounded-md max-h-[calc(100vh-100px)] overflow-auto;
+  }
+
+  .basic-input {
+    @apply border border-gray-300 p-1 mb-2;
+  }
+
+  .basic-button {
+    @apply site-green hover:site-yellow p-1 text-white hover:border-transparent rounded-md;
+  }
+
+  .link-button {
+    @apply text-blue-500 hover:underline mt-1;
+  }
+
+  /* Itineraries Page */
+
+  .list-button {
+    @apply site-green text-white px-2 flex w-full items-center justify-between hover:site-yellow;
+  }
+
+  .delete-button {
+    @apply text-xl h-[45px] flex items-center justify-center w-11 site-red hover:bg-[#fc1a1a] text-white cursor-pointer;
+  }
+
+  /* Itinerary Page */
+
+  .icon-button {
+    @apply cursor-pointer text-xl w-7 h-7 flex items-center justify-evenly hover:bg-[#F7B733] hover:text-white rounded-md;
+  }
+
+  .map-marker {
+    @apply site-green rounded-full text-white font-bold flex justify-center items-center;
   }
 
   .exit-map-btn {
@@ -60,6 +76,7 @@
   }
 
   .map-btn {
-    @apply text-xl basic-button h-9 w-9 flex items-center justify-center absolute right-3 z-[1000] cursor-pointer;
+    @apply basic-button text-xl h-9 w-9 flex items-center justify-center cursor-pointer;
   }
 }
+/* mt-3 mb-2 */

@@ -1,4 +1,4 @@
-# Itenerary MERN Full Stack App (w/ API)
+# Itenerary MERN Full Stack App
 
 ## Explanation
 
@@ -13,8 +13,8 @@ An itenerary website that allows you to create an itenerary on a day by day basi
 
 ## Other Tech & Libraries
 
-- Leaflet Maps API (open source)
-- TODO: React Big Calender (free) OR FullCalendar (free w/ some features locked behind paywall)
+- Leaflet Maps API
+- React Big Calendar
 
 ## Database
 
@@ -25,75 +25,42 @@ An itenerary website that allows you to create an itenerary on a day by day basi
   - password (hashed string)
   - email (string)
   - createdAt (string)
-  - iteneraries (array of object ids)
+  - updatedAt (string)
 
 - Itineraries Collection
 
   - \_id (ObjectId)
   - userId (ObjectId)
-  - title: (string)
+  - title (string)
   - startDate (string)
   - endDate (string)
   - activities (array of objects)
   - createdAt (string)
-  - updatedAr (string)
+  - updatedAt (string)
 
-- Itinerary Activity Object
+- Activities Collection
 
+  - \_id (ObjectId)
+  - userId (ObjectId)
+  - itineraryId (ObjectId)
   - date (string)
-  - time: (string)
+  - time (string)
   - activity (string)
-  - location (object)
-    - name (string)
-    - coordinates
-      - lat (decimal)
-      - lng (decimal)
+  - locationName (string)
+  - locationLat (decimal)
+  - locationLng (decimal)
   - notes (string)
   - completed (bool)
+  - createdAt (string)
+  - updatedAt (string)
 
-  Notes:
+## To Do
 
-  - Use ISODate for dates
-
-## Features / TODO
-
-- [ ] Account center
-
-  - [x] Sign in & Sign out
-  - [x] Sign up
-  - [ ] Delete Account
-  - [ ] Change username
-
-- [x] Create Itinerary
-- [x] Create activities
-
-- [x] Read Itinerary
-
-  - [x] Display all itineraries to select from
-  - [x] View Individual itineraries
-    - [x] View Title and dates
-    - [x] View activities
-
-- [x] Update Itinerary
-
-  - [x] Update Title and dates
-  - [x] Update activities
-    - [x] Mark as complete
-
-- [x] Delete Itinerary
-
-  - [x] Delete activities
-
-- [ ] Error handling
-
-- [ ] Interactive Components
-
-  - [x] Choose a location from the map via search (name or coordinates)
-  - [x] Filter itinerary by date
-  - [ ] View up to date itinerary on the map with numbered markers organized by colors based on the day
-    - [x] Completed activities grayed out
-  - [ ] View activities in a calendar view
-    - [ ] Export activities to external calendar applications
+- [ ] Delete Account
+- [ ] Change username
+- [ ] Error message handling (popups, modals, etc.)
+- [ ] View activities in a calendar view
+- [ ] Export activities to external calendar applications
 
 ## PHP Api
 

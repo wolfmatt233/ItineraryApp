@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
     if (response.ok) {
       setInitLoad(false);
       setUser(data);
+      setLoading(false);
     } else if (response.status === 403) {
       // try to refresh expired token with a new one
       refreshLogin();
@@ -59,11 +60,12 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    setLoading(false);
   };
 
   useEffect(() => {
     getUser();
-    setLoading(false);
+    // setLoading(false);
   }, []);
 
   return (

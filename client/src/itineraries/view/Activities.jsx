@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import ActivityMap from "./ActivityMap";
-import ActivitiesList from "./ActivityList";
+import ActivityList from "./ActivityList";
 import MapButtons from "./MapButtons";
 import DeleteActivity from "../delete/DeleteActivity";
 import { useItinerary } from "../../pages/itinerary/Itinerary";
@@ -51,13 +51,13 @@ export default function Activities() {
   };
 
   return (
-    <div className="-mx-4 sm:mx-0 relative">
+    <div className="relative">
       <ActivityContext.Provider value={contextSharing}>
         {modal && <DeleteActivity modal={modal} />}
 
         <MapButtons />
 
-        <ActivitiesList activities={filteredActivities} />
+        <ActivityList activities={filteredActivities} />
 
         <ActivityMap activities={filteredActivities} />
       </ActivityContext.Provider>

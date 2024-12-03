@@ -1,11 +1,12 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import EditInfo from "../../itineraries/edit/EditInfo";
 import AddActivity from "../../itineraries/add/AddActivity";
-import Calendar from "../../itineraries/view/Calendar";
+import ActivityCalendar from "../../itineraries/view/ActivityCalendar";
 import EditActivity from "../../itineraries/edit/EditActivity";
 import { apiRequests } from "../../requests/apiRequests";
 import { usePage } from "../../App";
 import Activities from "../../itineraries/view/Activities";
+import Loading from "../../layouts/Loading";
 
 const ItineraryContext = createContext();
 export const useItinerary = () => useContext(ItineraryContext);
@@ -55,31 +56,29 @@ export default function Itinerary({ id }) {
     setShowMap(false);
   }, [showCalendar]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <i className="fas fa-circle-notch fa-spin text-5xl text-black"></i>
-      </div>
-    );
-  }
+  const contextSharing = {
+    id,
+    itinerary,
+    setItinerary,
+    setShowMap,
+    showCalendar,
+    setShowCalendar,
+    setActivityId,
+  };
+
+  if (loading) return <Loading />;
 
   return (
-    <ItineraryContext.Provider
-      value={{
-        id,
-        itinerary,
-        setItinerary,
-        setShowMap,
-        showCalendar,
-        setShowCalendar,
-        setActivityId,
-      }}
-    >
+    <ItineraryContext.Provider value={contextSharing}>
       {itinerary && (
         <div className="page-layout flex flex-col">
           <EditInfo />
 
-          {showCalendar ? <Calendar itinerary={itinerary} /> : <Activities />}
+          {showCalendar ? (
+            <ActivityCalendar itinerary={itinerary} />
+          ) : (
+            <Activities />
+          )}
 
           {activityId && (
             <EditActivity

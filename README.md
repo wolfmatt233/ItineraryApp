@@ -56,8 +56,6 @@ An itenerary website that allows you to create an itenerary on a day by day basi
 
 ## To Do
 
-- [ ] Delete Account
-- [ ] Change Password
 - [ ] Error message handling (popups, modals, etc.)
 - [ ] Incorrect/empty input handling
 - [ ] Export activities to external calendar applications

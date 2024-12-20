@@ -9,7 +9,7 @@ export default function MapUpdater({ activities, boundsMap }) {
   useEffect(() => {
     const bounds = boundsMap(activities);
 
-    if (bounds.length > 0) {
+    if (activities.length > 0) {
       map.fitBounds(bounds, { padding: [50, 50] });
     }
   }, [map, activities]);

@@ -76,15 +76,49 @@ export const authRequests = () => {
   };
 
   const changePassword = async (formData) => {
-    fetch(`${apiUrl}/auth/change-password`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(itinerary),
-    });
+    try {
+      const response = await fetch(`${apiUrl}/auth/change-password`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      return { response, data };
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  return { fetchUser, tokenRefresh, fetchSignup, fetchLogin, changePassword };
+  const deleteAccount = async (formData) => {
+    try {
+      const response = await fetch(`${apiUrl}/auth`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      return { response, data };
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return {
+    fetchUser,
+    tokenRefresh,
+    fetchSignup,
+    fetchLogin,
+    changePassword,
+    deleteAccount,
+  };
 };

@@ -62,7 +62,7 @@ export default function MapButtons() {
 
       {/* Toggle scroll */}
       <i
-        className={`fa-solid fa-toggle-${scroll ? "on" : "off"} map-btn`}
+        className={`fa-solid fa-computer-mouse ${scroll && "text-blue-500"} map-btn`}
         title="Scroll Toggle"
         onClick={() => setScroll((prev) => !prev)}
       ></i>

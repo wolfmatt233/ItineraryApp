@@ -40,7 +40,7 @@ export default function ActivityMap({ activities }) {
     if (finalBounds.length > 0) {
       return finalBounds;
     } else {
-      return [[0, 0]];
+      return [[40.6501681934524, -73.9996029760112]];
     }
   };
   const bounds = boundsMap(activities);
@@ -48,14 +48,14 @@ export default function ActivityMap({ activities }) {
   return (
     <MapContainer
       className="h-[55vh] w-full"
-      zoom={3}
+      zoom={4}
       center={bounds[0]}
       scrollWheelZoom={false}
       zoomControl={false}
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='Map tiles by <a href="https://www.arcgis.com/">Esri</a>, sourced from OpenStreetMap and other contributors.'
+        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
       />
       <MapUpdater activities={activities} boundsMap={boundsMap} />
       <ZoomControl position="bottomright" />

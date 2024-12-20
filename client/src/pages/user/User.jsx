@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { authRequests } from "../../requests/authRequests";
 
 export default function User() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const { changePassword, deleteAccount } = authRequests();
   const [action, setAction] = useState();
   const [formData, setFormData] = useState({
     email: "",
@@ -10,7 +12,7 @@ export default function User() {
     newPassword: "",
   });
 
-  const handleChange = () => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -18,12 +20,31 @@ export default function User() {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     if (action === "password") {
       // send current info & new password
-      changePassword(formData);
+      const res = await changePassword(formData);
+      const { response, data } = res;
+
+      if (response.ok) {
+        setAction(null);
+        alert("Password changed successfully.");
+      } else {
+        alert(data.message);
+      }
     } else if (action === "delete") {
       // send current info to confirm & delete
+      const res = await deleteAccount(formData);
+      const { response, data } = res;
+
+      if (response.ok) {
+        setAction(null);
+        logout();
+      }
+
+      alert(data.message);
     }
   };
 
@@ -37,14 +58,14 @@ export default function User() {
         className="basic-button p-2 mb-3"
         onClick={() => setAction("password")}
       >
-        <i class="fa-solid fa-user-pen mr-2"></i>
+        <i className="fa-solid fa-user-pen mr-2"></i>
         Change Password
       </button>
       <button
         className="basic-button-red p-2 site-red hover:bg-[#fc1a1a]"
         onClick={() => setAction("delete")}
       >
-        <i class="fa-solid fa-user-xmark mr-2"></i>
+        <i className="fa-solid fa-user-xmark mr-2"></i>
         Delete Account
       </button>
 
@@ -77,10 +98,10 @@ export default function User() {
               />
               {action === "password" && (
                 <>
-                  <label htmlFor="password">Password</label>
+                  <label htmlFor="password">New Password</label>
                   <input
                     type="password"
-                    name="password"
+                    name="newPassword"
                     className="basic-input"
                     onChange={handleChange}
                   />

@@ -17,7 +17,7 @@ export default function SelectMap({ markers, setLocation, clusterGroupRef }) {
   const center =
     activities.length > 0
       ? [prevCoods.locationLat, prevCoods.locationLon]
-      : [0, 0];
+      : [40.6501681934524, -73.9996029760112];
 
   const FitSearchBounds = () => {
     const map = useMap();

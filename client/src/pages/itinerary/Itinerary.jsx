@@ -3,7 +3,8 @@ import EditInfo from "../../itineraries/edit/EditInfo";
 import AddActivity from "../../itineraries/add/AddActivity";
 import ActivityCalendar from "../../itineraries/view/ActivityCalendar";
 import EditActivity from "../../itineraries/edit/EditActivity";
-import { apiRequests } from "../../requests/apiRequests";
+import { itineraryRequests } from "../../requests/itineraryRequests";
+import { activityRequests } from "../../requests/activityRequests";
 import { usePage } from "../../App";
 import Activities from "../../itineraries/view/Activities";
 import Loading from "../../layouts/Loading";
@@ -13,7 +14,8 @@ export const useItinerary = () => useContext(ItineraryContext);
 
 export default function Itinerary({ id }) {
   const { setPage } = usePage();
-  const { fetchItinerary, fetchActivities } = apiRequests();
+  const { fetchItinerary } = itineraryRequests();
+  const { fetchActivities } = activityRequests();
   const [itinerary, setItinerary] = useState({});
   const [loading, setLoading] = useState(true);
   const [showMap, setShowMap] = useState(false);
@@ -75,7 +77,10 @@ export default function Itinerary({ id }) {
           <EditInfo />
 
           {showCalendar ? (
-            <ActivityCalendar itinerary={itinerary} />
+            <ActivityCalendar
+              itinerary={itinerary}
+              setActivityId={setActivityId}
+            />
           ) : (
             <Activities />
           )}

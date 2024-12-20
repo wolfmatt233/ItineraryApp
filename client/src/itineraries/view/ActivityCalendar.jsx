@@ -1,16 +1,16 @@
-import { useItinerary } from "../../pages/itinerary/Itinerary";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import moment from "moment";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 
 const localizer = momentLocalizer(moment);
 
-export default function ActivityCalendar({ itinerary }) {
+export default function ActivityCalendar({ itinerary, setActivityId }) {
   const calendarEvents = itinerary.activities.map((activity) => ({
     title: activity.activity,
     start: new Date(activity.date),
     end: new Date(activity.date),
     resource: {
+      id: activity._id,
       locationName: activity.locationName,
       notes: activity.notes,
       date: activity.date,
@@ -24,7 +24,7 @@ export default function ActivityCalendar({ itinerary }) {
       )
     )
   );
-  
+
   // TODO: Show edit modal on event click
 
   return (
@@ -36,14 +36,7 @@ export default function ActivityCalendar({ itinerary }) {
         startAccessor="start"
         endAccessor="end"
         style={{ height: 500 }}
-        onSelectEvent={(event) => {
-          const date = event.resource.date.split("T")[0];
-          const time = event.resource.date.split("T")[1];
-
-          alert(
-            `${event.title} @ ${event.resource.locationName}\n${date} @ ${time}`
-          );
-        }}
+        onSelectEvent={(event) => setActivityId(event.resource.id)}
       />
     </div>
   );

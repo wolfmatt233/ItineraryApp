@@ -9,11 +9,11 @@ const router = Router();
 
 // Itineraries CRUD
 
-router.get("/", authMiddleware, async (req, res) => {
+const getItineraries = async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 
   try {
-    // Find all itineraries
+    // Find all itineraries for user
     const itineraries = await Itinerary.find({
       userId: req.user.id,
     });
@@ -23,11 +23,11 @@ router.get("/", authMiddleware, async (req, res) => {
 
     res.status(200).json(pagination);
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving itineraries" });
+    res.status(500).json({ message: "Internal server error" });
   }
-});
+};
 
-router.get("/:id", authMiddleware, async (req, res) => {
+const getItineraryById = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -43,11 +43,11 @@ router.get("/:id", authMiddleware, async (req, res) => {
 
     res.status(200).json(itinerary);
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving itineraries" });
+    res.status(500).json({ message: "Internal server error" });
   }
-});
+};
 
-router.post("/", authMiddleware, async (req, res) => {
+const createItinerary = async (req, res) => {
   const { title, startDate, endDate } = req.body;
 
   if (hasEmptyInputs(req.body)) {
@@ -67,11 +67,11 @@ router.post("/", authMiddleware, async (req, res) => {
 
     res.status(201).json(newItinerary);
   } catch (error) {
-    res.status(500).json({ message: "Error creating itinerary" });
+    res.status(500).json({ message: "Internal server error" });
   }
-});
+};
 
-router.patch("/:id", authMiddleware, async (req, res) => {
+const updateItinerary = async (req, res) => {
   const { id } = req.params;
   const { title, startDate, endDate, activities, notes, completed } = req.body;
 
@@ -102,12 +102,11 @@ router.patch("/:id", authMiddleware, async (req, res) => {
 
     res.status(200).json(updatedItinerary);
   } catch (error) {
-    console.log("ERROR", error);
-    res.status(500).json({ message: "Error updating itinerary", error: error });
+    res.status(500).json({ message: "Internal server error" });
   }
-});
+};
 
-router.delete("/:id", authMiddleware, async (req, res) => {
+const deleteItinerary = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -124,14 +123,11 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     await itinerary.deleteOne();
     res.status(200).json({ message: "Successfully deleted itinerary" });
   } catch (error) {
-    console.log("ERROR", error);
-    res.status(500).json({ message: "Error deleting itinerary" });
+    res.status(500).json({ message: "Internal server error" });
   }
-});
+};
 
-// Activities via Itinerary id: read and create
-
-router.get("/:id/activities", authMiddleware, async (req, res) => {
+const getActivitiesByItinerary = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -142,38 +138,17 @@ router.get("/:id/activities", authMiddleware, async (req, res) => {
 
     res.status(200).json(activities);
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving activities" });
+    res.status(500).json({ message: "Internal server error" });
   }
-});
+};
 
-router.post("/:id/activities", authMiddleware, async (req, res) => {
-  const { id } = req.params;
-  const { date, activity, locationName, locationLat, locationLon, notes } =
-    req.body;
+// Routes, all auth protected
 
-  if (hasEmptyInputs(req.body)) {
-    return res.status(400).json({ message: "All fields must be completed." });
-  }
-
-  try {
-    const newActivity = new Activity({
-      userId: req.user.id,
-      itineraryId: id,
-      date,
-      activity,
-      locationName,
-      locationLat,
-      locationLon,
-      notes,
-      completed: false,
-    });
-
-    await newActivity.save();
-
-    res.status(201).json(newActivity);
-  } catch (error) {
-    res.status(500).json({ message: "Error creating activity" });
-  }
-});
+router.get("/", authMiddleware, getItineraries);
+router.get("/:id", authMiddleware, getItineraryById);
+router.post("/", authMiddleware, createItinerary);
+router.patch("/:id", authMiddleware, updateItinerary);
+router.delete("/:id", authMiddleware, deleteItinerary);
+router.get("/:id/activities", authMiddleware, getActivitiesByItinerary); // activities
 
 export default router;

@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useItinerary } from "../../pages/itinerary/Itinerary";
-import { apiRequests } from "../../requests/apiRequests";
 import { removeTime } from "../functions/formatDate";
+import { activityRequests } from "../../requests/activityRequests";
 
 export default function AddForm({ setLocation, location }) {
   const { id, itinerary, setItinerary, setShowMap } = useItinerary();
-  const { createActivity } = apiRequests();
+  const { createActivity } = activityRequests();
   const [newActivity, setNewActivity] = useState({
     date: "",
     activity: "",

@@ -6,22 +6,9 @@ import authMiddleware from "../Middleware/authMiddleware.js";
 
 const router = Router();
 
-router.get("/user", authMiddleware, async (req, res) => {
-  try {
-    // Find the user
-    const user = await User.findById(req.user.id);
+// Auth functions
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ message: "Error finding user" });
-  }
-});
-
-router.post("/login", async (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -33,7 +20,7 @@ router.post("/login", async (req, res) => {
     }
 
     // Compare passwords
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -61,11 +48,26 @@ router.post("/login", async (req, res) => {
       message: "Logged in successfully",
     });
   } catch (error) {
-    res.status(500).json({ message: "Error logging in" });
+    res.status(500).json({ message: "Internal server error" });
   }
-});
+};
 
-router.post("/refresh-token", async (req, res) => {
+const getUser = async (req, res) => {
+  try {
+    // Find the user
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const refreshToken = async (req, res) => {
   const refreshToken = req.header("Authorization")?.split(" ")[1];
 
   if (!refreshToken) {
@@ -92,11 +94,11 @@ router.post("/refresh-token", async (req, res) => {
 
     res.json({ accessToken: newAccessToken });
   } catch (error) {
-    res.status(500).json({ message: "Error refreshing token" });
+    res.status(500).json({ message: "Internal server error" });
   }
-});
+};
 
-router.post("/register", async (req, res) => {
+const register = async (req, res) => {
   const { username, password, email } = req.body; //retrieve input vars
 
   try {
@@ -119,8 +121,54 @@ router.post("/register", async (req, res) => {
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error registering user" });
+    res.status(500).json({ message: "Internal server error" });
   }
-});
+};
+
+const changePassword = async (req, res) => {
+  const { username, password, newPassword, email } = req.body;
+  const refreshToken = req.header("Authorization")?.split(" ")[1];
+
+  if (!refreshToken) {
+    return res.status(401).json({ message: "Refresh token is required" });
+  }
+
+  try {
+    const decodedToken = jwt.verify(refreshToken, process.env.JWT_SECRET);
+
+    // Find user
+    const user = await User.findOne({ email });
+
+    // No email exists or email does not match current user
+    if (!user || user._id != decodedToken.id) {
+      return res.status(400).json({ message: "Invalid email" });
+    }
+
+    // Compare passwords
+    const isMatch = bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid password" });
+    }
+
+    // Change the password
+    const newHashedPassword = await bcrypt.hash(password, 10);
+
+    user.password = newHashedPassword;
+
+    res.status(201).json({ message: "Password changed successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Routes
+
+router.get("/user", authMiddleware, getUser); // Protected
+router.post("/change-password", authMiddleware, changePassword); // Protected
+router.post("/login", login);
+router.post("/refresh-token", refreshToken);
+router.post("/register", register);
+
 
 export default router;

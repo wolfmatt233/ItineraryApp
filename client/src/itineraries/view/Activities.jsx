@@ -35,8 +35,11 @@ export default function Activities() {
   }, [modal]);
 
   const filteredActivities = useMemo(() => {
-    if (!filterDate) return sortDates(itinerary.activities);
-    return sortDates(itinerary.activities).filter(
+    let sortedDates = sortDates(itinerary.activities);
+
+    if (!filterDate) return sortedDates;
+
+    return sortedDates.filter(
       (activity) => activity.date.split("T")[0] === filterDate
     );
   }, [filterDate, itinerary.activities]);
@@ -59,7 +62,10 @@ export default function Activities() {
 
         <ActivityList activities={filteredActivities} />
 
-        <ActivityMap activities={filteredActivities} />
+        <ActivityMap
+          key={filteredActivities.length}
+          activities={filteredActivities}
+        />
       </ActivityContext.Provider>
     </div>
   );

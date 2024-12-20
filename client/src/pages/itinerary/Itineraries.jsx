@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { usePage } from "../../App";
 import { formatDate } from "../../itineraries/functions/formatDate";
 import DeleteItinerary from "../../itineraries/delete/DeleteItinerary";
-import { apiRequests } from "../../requests/apiRequests";
 import Loading from "../../layouts/Loading";
+import { itineraryRequests } from "../../requests/itineraryRequests";
 
 export default function Itineraries() {
   const { setPage } = usePage();
-  const { fetchItineraries } = apiRequests();
+  const { fetchItineraries } = itineraryRequests();
   const [itineraries, setItineraries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState(false);

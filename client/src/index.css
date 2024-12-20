@@ -17,10 +17,14 @@
     @apply bg-[#fc4a1a];
   }
 
+  .alt-red {
+    @apply bg-[#fc1a1a];
+  }
+
   /* General Page Items */
 
   .nav-button {
-    @apply text-lg hover:bg-[#F7B733] px-2;
+    @apply text-lg hover:site-yellow px-2;
   }
 
   .page-layout {
@@ -43,6 +47,10 @@
     @apply site-green hover:site-yellow p-1 text-white hover:border-transparent rounded-md;
   }
 
+  .basic-button-red {
+    @apply site-red hover:alt-red p-1 text-white hover:border-transparent rounded-md shadow-lg;
+  }
+
   .link-button {
     @apply text-blue-500 hover:underline mt-1;
   }
@@ -54,13 +62,13 @@
   }
 
   .delete-button {
-    @apply text-xl h-[45px] flex items-center justify-center w-11 site-red hover:bg-[#fc1a1a] text-white cursor-pointer;
+    @apply text-xl h-[45px] flex items-center justify-center w-11 site-red hover:alt-red text-white cursor-pointer;
   }
 
   /* Itinerary Page */
 
   .icon-button {
-    @apply cursor-pointer text-xl w-7 h-7 flex items-center justify-evenly hover:bg-[#F7B733] hover:text-white rounded-md;
+    @apply cursor-pointer text-xl w-7 h-7 flex items-center justify-evenly hover:site-yellow hover:text-white rounded-md;
   }
 
   .map-marker {
@@ -68,7 +76,7 @@
   }
 
   .exit-map-btn {
-    @apply absolute z-[1000] right-3 top-[10px] basic-button m-0 bg-red-400 text-white hover:bg-red-500 h-9 w-9 flex items-center justify-center max-sm:right-6 cursor-pointer;
+    @apply absolute z-[1000] right-3 top-[10px] basic-button m-0 site-red hover:bg-[#fc1a1a] text-white h-9 w-9 flex items-center justify-center max-sm:right-6 cursor-pointer;
   }
 
   .list-title {
@@ -79,4 +87,3 @@
     @apply basic-button text-xl h-9 w-9 flex items-center justify-center cursor-pointer;
   }
 }
-/* mt-3 mb-2 */

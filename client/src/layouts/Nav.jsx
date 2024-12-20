@@ -8,7 +8,7 @@ export default function Nav() {
   const [toggleDropdown, setToggleDropdown] = useState(false);
 
   return (
-    <div className="site-green text-white relative">
+    <div className="site-green text-white relative shadow-md">
       {toggleDropdown && (
         <div className="absolute top-0 left-0 w-[70vw] h-screen bg-gray-100 z-[10000] border-r">
           <i

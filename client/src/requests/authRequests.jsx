@@ -75,5 +75,16 @@ export const authRequests = () => {
     }
   };
 
-  return { fetchUser, tokenRefresh, fetchSignup, fetchLogin };
+  const changePassword = async (formData) => {
+    fetch(`${apiUrl}/auth/change-password`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(itinerary),
+    });
+  };
+
+  return { fetchUser, tokenRefresh, fetchSignup, fetchLogin, changePassword };
 };

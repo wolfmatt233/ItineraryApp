@@ -5,9 +5,9 @@ import { hasEmptyInputs } from "../Utils/emptyInputs.js";
 
 const router = Router();
 
-// Activity: read, update, delete
+// Activities CUD
 
-router.post("/:id", authMiddleware, async (req, res) => {
+const createActivity = async (req, res) => {
   const { id } = req.params;
   const { date, activity, locationName, locationLat, locationLon, notes } =
     req.body;
@@ -33,31 +33,11 @@ router.post("/:id", authMiddleware, async (req, res) => {
 
     res.status(201).json(newActivity);
   } catch (error) {
-    res.status(500).json({ message: "Error creating activity" });
+    res.status(500).json({ message: "Internal server error" });
   }
-});
+};
 
-router.get("/:id", authMiddleware, async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    // Find activity
-    const activity = await Activity.findOne({
-      userId: req.user.id,
-      _id: id,
-    }).select("-updatedAt -createdAt -__v");
-
-    if (!activity) {
-      return res.status(404).json({ message: "Activity not found" });
-    }
-
-    res.status(200).json(activity);
-  } catch (error) {
-    res.status(500).json({ message: "Error retrieving activities" });
-  }
-});
-
-router.patch("/:id", authMiddleware, async (req, res) => {
+const updateActivity = async (req, res) => {
   const { id } = req.params;
   const { date, locationName, locationLat, locationLon, notes, completed } =
     req.body;
@@ -94,9 +74,9 @@ router.patch("/:id", authMiddleware, async (req, res) => {
     console.log("ERROR", error);
     res.status(500).json({ message: "Error updating activity", error: error });
   }
-});
+};
 
-router.delete("/:id", authMiddleware, async (req, res) => {
+const deleteActivity = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -116,6 +96,12 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     console.log("ERROR", error);
     res.status(500).json({ message: "Error deleting activity" });
   }
-});
+};
+
+// Routes, all auth protected
+
+router.post("/:id", authMiddleware, createActivity);
+router.patch("/:id", authMiddleware, updateActivity);
+router.delete("/:id", authMiddleware, deleteActivity);
 
 export default router;

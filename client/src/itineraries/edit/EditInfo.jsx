@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { formatDate, removeTime } from "../functions/formatDate";
-import { apiRequests } from "../../requests/apiRequests";
+import { removeTime } from "../functions/formatDate";
+import { itineraryRequests } from "../../requests/itineraryRequests";
 import { useItinerary } from "../../pages/itinerary/Itinerary";
 
 export default function EditInfo() {
   const { id, itinerary, setItinerary, showCalendar, setShowCalendar } =
     useItinerary();
-  const { updateItinerary } = apiRequests();
+  const { updateItinerary } = itineraryRequests();
   const [edit, setEdit] = useState(false);
   const [updatedItinerary, setUpdatedItinerary] = useState(itinerary);
 

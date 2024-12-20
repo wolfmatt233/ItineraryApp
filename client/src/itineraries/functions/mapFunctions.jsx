@@ -34,3 +34,11 @@ export const clickMarker = (clusterGroupRef, id) => {
 export const sortDates = (activities) => {
   return activities.sort((a, b) => new Date(a.date) - new Date(b.date));
 };
+
+export const createNumberedIcon = (number, completed) => {
+  return L.divIcon({
+    html: `<div>${number}</div>`,
+    className: `map-marker ${completed && "bg-gray-500"}`,
+    iconSize: [30, 30],
+  });
+};

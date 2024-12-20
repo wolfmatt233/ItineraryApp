@@ -1,4 +1,4 @@
-import { apiRequests } from "../../requests/apiRequests";
+import { itineraryRequests } from "../../requests/itineraryRequests";
 
 export default function DeleteItinerary({
   id,
@@ -6,7 +6,7 @@ export default function DeleteItinerary({
   setModal,
   setItineraries,
 }) {
-  const { deleteItinerary } = apiRequests();
+  const { deleteItinerary } = itineraryRequests();
 
   const handleDelete = async (e) => {
     e.preventDefault();
@@ -24,7 +24,7 @@ export default function DeleteItinerary({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-40">
-      <div className="login-modal bg-white">
+      <div className="modal w-1/2 bg-white">
         <p className="text-lg text-center">
           Are you sure you want to delete <b>{name}</b>?
         </p>

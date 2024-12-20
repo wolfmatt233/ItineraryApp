@@ -71,5 +71,3 @@ export default function ActivityList({ activities }) {
     </>
   );
 }
-
-// max-h-[440px]

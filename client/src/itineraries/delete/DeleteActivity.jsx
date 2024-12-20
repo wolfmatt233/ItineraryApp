@@ -1,11 +1,11 @@
 import { useItinerary } from "../../pages/itinerary/Itinerary";
-import { apiRequests } from "../../requests/apiRequests";
+import { activityRequests } from "../../requests/activityRequests";
 import { useActivity } from "../view/Activities";
 
 export default function DeleteActivity({ modal }) {
   const { itinerary, setItinerary } = useItinerary();
   const { setModal } = useActivity();
-  const { deleteActivity } = apiRequests();
+  const { deleteActivity } = activityRequests();
 
   const handleDelete = async (e) => {
     e.preventDefault();
@@ -28,7 +28,7 @@ export default function DeleteActivity({ modal }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[5000]">
-      <div className="login-modal bg-white">
+      <div className="modal w-3/4 bg-white">
         <p className="text-lg text-center">Are you sure?</p>
         <form className="flex justify-evenly mt-3">
           <button

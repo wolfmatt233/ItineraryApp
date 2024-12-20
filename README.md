@@ -57,20 +57,11 @@ An itenerary website that allows you to create an itenerary on a day by day basi
 ## To Do
 
 - [ ] Delete Account
-- [ ] Change username
+- [ ] Change Password
 - [ ] Error message handling (popups, modals, etc.)
-- [ ] View activities in a calendar view
+- [ ] Incorrect/empty input handling
 - [ ] Export activities to external calendar applications
 
 ## PHP Api
 
-- Added a PHP version of the api for my own practice that works the same, just using MySQL.
-
-## Possible Features (uncertain)
-
-- After the Trip
-  - Give the user the ability to upload an image for each location. Make a slideshow type animation where the map zooms to each area of the map to show the name of the activity and location along with the image provided.
-    - 1st: Name of the itinerary. Animation starts at the opposite side of the globe then flips around to the starting area in view (i.e., See Iceland in it's entirety if that is where the trip was).
-    - 2nd: Then zoom in to the first location, show its name, activity, and picture
-    - 3rd: Fly across the map to each location and do the same.
-    - 4th: Finish title
+I added a PHP version of the api for my own practice that works the same, just using MySQL and a custom PHP router. I originally created the front end to work with MongoDB so, there are some features within the front end to help data from the PHP api work with the client. Primarily I added an identifier, _id, to JSON objects that come from the PHP api.

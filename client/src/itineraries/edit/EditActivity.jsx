@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useItinerary } from "../../pages/itinerary/Itinerary";
-import { apiRequests } from "../../requests/apiRequests";
+import { activityRequests } from "../../requests/activityRequests";
 import { removeTime } from "../functions/formatDate";
 
 export default function EditActivity({ activityId, setActivityId }) {
-  const { id, itinerary, setItinerary } = useItinerary();
-  const { updateActivity } = apiRequests();
+  const { itinerary, setItinerary } = useItinerary();
+  const { updateActivity } = activityRequests();
   const [updatedActivity, setUpdatedActivity] = useState(
     itinerary.activities.filter((activity) => activity._id === activityId)[0]
   );
@@ -66,7 +66,7 @@ export default function EditActivity({ activityId, setActivityId }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[5000]">
-      <div className="modal w-3/4  bg-white">
+      <div className="modal w-3/4 bg-white">
         <form className="flex flex-col">
           <p className="text-lg font-semibold">Edit Activity</p>
           {editToggle ? (

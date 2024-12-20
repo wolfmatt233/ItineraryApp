@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { usePage } from "../../App";
-import { apiRequests } from "../../requests/apiRequests";
+import { itineraryRequests } from "../../requests/itineraryRequests";
 
 export default function CreateItinerary() {
   const { setPage } = usePage();
-  const { createItinerary } = apiRequests();
+  const { createItinerary } = itineraryRequests();
   const [newItinerary, setNewItinerary] = useState({
     title: "",
     startDate: "",

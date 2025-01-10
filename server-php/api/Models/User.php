@@ -1,9 +1,8 @@
 <?php
 
-namespace ItineraryApi\Models;
+namespace Api\Models;
 
 use Illuminate\Database\Eloquent\Model as Model;
-use ItineraryApi\Utils\UnauthorizedException;
 
 class User extends Model
 {
@@ -11,31 +10,16 @@ class User extends Model
 
     protected $primaryKey = 'id';
 
-    protected $hidden = ['password', 'created_at', 'updated_at'];
-
-    public function itineraries()
-    {
-        return $this->hasMany(Itinerary::class, 'itinerary_id');
-    }
+    protected $hidden = ['id', 'password', 'created_at', 'updated_at'];
 
     public function token()
     {
-        return $this->belongsTo(Token::class, 'id');
+        return $this->hasOne(Token::class, 'id');
     }
 
-    public static function getUsers()
+    public static function getUserByUid($userId)
     {
-        return self::all();
-    }
-
-    public static function getAccount($userId)
-    {
-        return self::findOrFail($userId);
-    }
-
-    public static function getUser($id)
-    {
-        return self::findOrFail($id);
+        return self::where('id', $userId)->first();
     }
 
     public static function getUserByEmail($email)
@@ -43,42 +27,27 @@ class User extends Model
         return self::where('email', $email)->first();
     }
 
-    public static function createUser()
+    public static function createUser($body)
     {
-        UnauthorizedException::checkEmail($_REQUEST['email'], null);
-
         $user = new User();
-        $user->username = $_REQUEST['username'];
-        $user->email = $_REQUEST['email'];
-        $user->password = password_hash($_REQUEST['password'], PASSWORD_DEFAULT);
+        $user->username = $body['username'];
+        $user->email = $body['email'];
+        $user->password = password_hash($body['password'], PASSWORD_DEFAULT);
         $user->save();
 
-        return $user;
+        return $user['id'];
     }
 
-    public static function updateUser($id, $userId)
+    public static function updatePassword($userId, $newPassword)
     {
-        $user = self::findOrFail($id);
-        UnauthorizedException::checkId($user->id, $userId);
-        UnauthorizedException::checkEmail($_REQUEST['email'], $userId);
-
-        foreach ($_REQUEST as $field => $value) {
-            if ($field === 'password') {
-                $user->password = password_hash($_REQUEST['password'], PASSWORD_DEFAULT);
-            } else {
-                $user->$field = $value;
-            }
-        }
-
+        $user = self::getUserByUid($userId);
+        $user->password = password_hash($newPassword, PASSWORD_DEFAULT);
         $user->save();
-        return $user;
     }
 
-    public static function deleteUser($id, $userId)
+    public static function deleteUser($userId)
     {
-        $user = self::findOrFail($id);
-        UnauthorizedException::checkId($user->id, $userId);
-
+        $user = self::find($userId)->first();
         return $user->delete();
     }
 }

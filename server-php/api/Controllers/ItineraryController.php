@@ -1,59 +1,79 @@
 <?php
 
-namespace ItineraryApi\Controllers;
+namespace Api\Controllers;
 
-use ItineraryApi\Models\Itinerary;
-use ItineraryApi\Utils\IdentifierFormatter;
-use ItineraryApi\Utils\InputValidator;
+use Api\Models\Itinerary;
+use Api\Utils\Converter;
+use Api\Utils\Utils;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 class ItineraryController
 {
-    public $requiredFields = ['title', 'start_date', 'end_date'];
-
-    public function index($userId)
+    public function index(Request $request, Response $response, array $args)
     {
-        $res = Itinerary::getItineraries($userId);
-        $res = $res->toArray();
+        $uid = $request->getAttribute('userId');
+        $itineraries = Converter::convertArrayofObjects(Itinerary::getItineraries($uid));
 
-        $resCamelCase = array_map(function ($item) {
-            return IdentifierFormatter::convertArrayKeysToCamelCase($item);
-        }, $res);
-
-        return ['status' => 200, 'data' => ['items' => $resCamelCase]];
+        return Utils::jsonResponse($response, $itineraries);
     }
 
-    public function view($id, $userId)
+    public function view(Request $request, Response $response, array $args)
     {
-        $res = Itinerary::getItinerary($id, $userId);
-        $attributes = $res->getAttributes();
+        $id = $args['id'];
+        $uid = $request->getAttribute('userId');
 
-        $resCamelCase = IdentifierFormatter::convertArrayKeysToCamelCase($attributes);
-        return ['status' => 200, 'data' => $resCamelCase];
+        $itinerary = Itinerary::getItineraryById($id, $uid);
+
+        if (!$itinerary) {
+            return Utils::errorResponse($response, 'Itinerary not found', 404);
+        }
+
+        return Utils::jsonResponse($response, Converter::convertObject($itinerary));
     }
 
-    public function create($userId)
+    public function create(Request $request, Response $response, array $args)
     {
-        InputValidator::emptyInputs($this->requiredFields);
-        $res = Itinerary::createItinerary($userId);
-        $attributes = $res->getAttributes();
+        $body = Converter::convertKeysToSnakeCase($request->getParsedBody());
+        $uid = $request->getAttribute('userId');
 
-        $resCamelCase = IdentifierFormatter::convertArrayKeysToCamelCase($attributes);
-        return ['status' => 200, 'data' => $resCamelCase];
+        $requiredFields = ['title', 'start_date', 'end_date'];
+        $validated = Utils::validateInputs($response, $requiredFields, $body);
+
+        if (!$validated) {
+            return $response;
+        }
+
+        $itinerary = Itinerary::createItinerary($uid, $body);
+
+        return Utils::jsonResponse($response, Converter::convertObject($itinerary));
     }
 
-    public function update($id, $userId)
+    public function update(Request $request, Response $response, array $args)
     {
-        InputValidator::emptyInputs($this->requiredFields);
-        $res = Itinerary::updateItinerary($id, $userId);
-        $attributes = $res->getAttributes();
+        $body = Converter::convertKeysToSnakeCase($request->getParsedBody());
+        $id = $args['id'];
+        $uid = $request->getAttribute('userId');
 
-        $resCamelCase = IdentifierFormatter::convertArrayKeysToCamelCase($attributes);
-        return ['status' => 200, 'data' => $resCamelCase];
+        $itinerary = Itinerary::updateItinerary($id, $uid, $body);
+
+        if (!$itinerary) {
+            return Utils::errorResponse($response, 'Itinerary not found', 404);
+        }
+
+        return Utils::jsonResponse($response, data: Converter::convertObject($itinerary));
     }
 
-    public function delete($id, $userId)
+    public function delete(Request $request, Response $response, array $args)
     {
-        Itinerary::deleteItinerary($id, $userId);
-        return ['status' => 200, 'message' => 'Itinerary successfully deleted'];
+        $id = $args['id'];
+        $uid = $request->getAttribute('userId');
+        $result = Itinerary::deleteItinerary($id, $uid);
+
+        if (!$result) {
+            return Utils::errorResponse($response, 'Itinerary not found', 404);
+        }
+
+        return Utils::jsonResponse($response, ['message' => 'Itinerary successfully deleted']);
     }
 }

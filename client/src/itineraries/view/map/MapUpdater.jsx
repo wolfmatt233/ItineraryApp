@@ -1,5 +1,5 @@
 import { useMap } from "react-leaflet";
-import { useActivity } from "./Activities";
+import { useActivity } from "../Activities";
 import { useEffect } from "react";
 
 export default function MapUpdater({ activities, boundsMap }) {

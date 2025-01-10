@@ -6,12 +6,12 @@ import {
   TileLayer,
   ZoomControl,
 } from "react-leaflet";
-import { useActivity } from "./Activities";
-import { createNumberedIcon, sortDates } from "../functions/mapFunctions";
+import { useActivity } from "../Activities";
+import { createNumberedIcon, sortDates } from "../../functions/mapFunctions";
 import MapUpdater from "./MapUpdater";
 import MarkerClusterGroup from "react-leaflet-markercluster";
-import { useItinerary } from "../../pages/itinerary/Itinerary";
-import { convertDate, getTime } from "../functions/formatDate";
+import { useItinerary } from "../../../pages/itinerary/Itinerary";
+import { convertDate, getTime } from "../../functions/formatDate";
 
 export default function ActivityMap({ activities }) {
   const { setShowMap, setActivityId } = useItinerary();
@@ -25,8 +25,7 @@ export default function ActivityMap({ activities }) {
       (activity) => activity.completed === 1 || activity.completed
     );
 
-    // If no filter and all are not complete
-    // filter out completed activities for bounds
+    // If no filter and all are not complete, filter out completed activities for bounds
     if (filterDate === "" && !areAllCompleted) {
       sortedDates = sortedDates.filter(
         (activity) => activity.completed === 0 || !activity.completed

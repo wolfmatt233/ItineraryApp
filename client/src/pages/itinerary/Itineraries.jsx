@@ -17,10 +17,10 @@ export default function Itineraries() {
     const res = await fetchItineraries();
     const { response, data } = res;
 
-    if (!data.items) {
+    if (!data) {
       setPage(`error:${data.message}`);
     } else {
-      setItineraries(data.items);
+      setItineraries(data);
     }
 
     setLoading(false);

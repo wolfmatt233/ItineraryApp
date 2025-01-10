@@ -19,9 +19,9 @@ const getItineraries = async (req, res) => {
     });
 
     // Paginate
-    const pagination = paginate(itineraries, parseInt(page), parseInt(limit));
+    // const pagination = paginate(itineraries, parseInt(page), parseInt(limit));
 
-    res.status(200).json(pagination);
+    res.status(200).json(itineraries);
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }

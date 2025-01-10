@@ -5,7 +5,7 @@ export const authRequests = () => {
     const accessToken = localStorage.getItem("accessToken");
 
     try {
-      const response = await fetch(`${apiUrl}/auth/user`, {
+      const response = await fetch(`${apiUrl}/auth`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -77,8 +77,8 @@ export const authRequests = () => {
 
   const changePassword = async (formData) => {
     try {
-      const response = await fetch(`${apiUrl}/auth/change-password`, {
-        method: "POST",
+      const response = await fetch(`${apiUrl}/auth/update-password`, {
+        method: "PATCH",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           "Content-Type": "application/json",

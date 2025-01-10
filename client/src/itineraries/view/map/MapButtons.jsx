@@ -1,7 +1,7 @@
 import { useRef } from "react";
-import { useItinerary } from "../../pages/itinerary/Itinerary";
-import { useActivity } from "./Activities";
-import { removeTime } from "../functions/formatDate";
+import { useItinerary } from "../../../pages/itinerary/Itinerary";
+import { useActivity } from "../Activities";
+import { removeTime } from "../../functions/formatDate";
 
 export default function MapButtons() {
   const { itinerary, setShowMap, setShowCalendar } = useItinerary();
@@ -62,7 +62,9 @@ export default function MapButtons() {
 
       {/* Toggle scroll */}
       <i
-        className={`fa-solid fa-computer-mouse ${scroll && "text-blue-500"} map-btn`}
+        className={`fa-solid fa-computer-mouse ${
+          scroll && "text-blue-500"
+        } map-btn`}
         title="Scroll Toggle"
         onClick={() => setScroll((prev) => !prev)}
       ></i>

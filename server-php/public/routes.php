@@ -1,58 +1,49 @@
 <?php
 
-use ItineraryApi\Controllers\AuthController;
-use ItineraryApi\Controllers\UserController;
-use ItineraryApi\Controllers\ItineraryController;
-use ItineraryApi\Controllers\ActivityController;
-use ItineraryApi\Middleware\AuthMiddleware;
-use ItineraryApi\Middleware\ParserMiddleware;
-use ItineraryApi\Routing\Router;
+use Api\Controllers\ActivityController;
+use Api\Controllers\AuthController;
+use Api\Controllers\ItineraryController;
+use Api\Controllers\UserController;
+use Api\Middleware\AuthMiddleware;
+use Api\Middleware\ReAuthMiddleware;
+use Slim\Routing\RouteCollectorProxy as Group;
+use Slim\Middleware\BodyParsingMiddleware as ParserMiddleware;
 
-$router = new Router();
-
-$jsonMware = [ParserMiddleware::class, 'handleParse'];
-$authMware = [AuthMiddleware::class, 'verifyToken'];
-
-$router->get('/', function () {
-    return ['status' => 200, 'data' => 'API HOME'];
-});
-
-$router->group('/api', [$jsonMware], function ($router) use ($authMware) {
-    // Unprotected user routes
-    $router->post('/auth/register', [UserController::class, 'create']);
-    $router->post('/auth/login', [AuthController::class, 'login']);
-    $router->post('/auth/refresh-token', [AuthController::class, 'refreshToken']);
-
-    // Protected user routes
-    $router->group('/auth', [$authMware], function ($router) {
-        $router->get('/users', [UserController::class, 'index']);
-        $router->get('/user', [UserController::class, 'account']);
-        $router->get('/{id}', [UserController::class, 'view']);
-
-        $router->patch('/{id}', [UserController::class, 'update']);
-        $router->delete('/{id}', [UserController::class, 'delete']);
+$app->group('/api', function (Group $group) {
+    // Unprotected auth Routes
+    $group->group('/auth', function (Group $group) {
+        $group->post('/register', [UserController::class, 'create']);
+        $group->post('/login', [AuthController::class, 'login']);
+        $group->post('/refresh-token', [AuthController::class, 'refreshToken']);
     });
 
-    $router->group('/itineraries', [$authMware], function ($router) {
-        $router->get('', [ItineraryController::class, 'index']);
-        $router->get('/{id}', [ItineraryController::class, 'view']);
-        $router->get('/{id}/activities', [ActivityController::class, 'index']);
+    // Protected auth Routes
+    $group->group('/auth', function (Group $group) {
+        $group->get('', [UserController::class, 'view']);
 
-        $router->post('', [ItineraryController::class, 'create']);
-        $router->patch('/{id}', [ItineraryController::class, 'update']);
-        $router->delete('/{id}', [ItineraryController::class, 'delete']);
-    });
+        // Rauthorize with email and password
+        $group->group('', function (Group $group) {
+            $group->patch('/update-password', [UserController::class, 'update']);
+            $group->delete('', [UserController::class, 'delete']);
+        })->add(new ReAuthMiddleware());
 
-    $router->group('/activities', [$authMware], function ($router) {
-        $router->get('/{id}', [ActivityController::class, 'view']);
+    })->add(new AuthMiddleware());
 
-        $router->post('/{id}', [ActivityController::class, 'create']);
-        $router->patch('/{id}', [ActivityController::class, 'update']);
-        $router->delete('/{id}', [ActivityController::class, 'delete']);
-    });
-});
+    // Itineraries
+    $group->group('/itineraries', function (Group $group) {
+        $group->get('', [ItineraryController::class, 'index']);
+        $group->get('/{id}', [ItineraryController::class, 'view']);
+        $group->post('', [ItineraryController::class, 'create']);
+        $group->patch('/{id}', [ItineraryController::class, 'update']);
+        $group->delete('/{id}', [ItineraryController::class, 'delete']);
 
-$method = $_SERVER['REQUEST_METHOD'];
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-$router->dispatch($method, $uri);
+        // Activities by itinerary id
+        $group->group('/{id}/activities', function (Group $group) {
+            $group->get('', [ActivityController::class, 'index']);
+            $group->get('/{actId}', [ActivityController::class, 'view']);
+            $group->post('', [ActivityController::class, 'create']);
+            $group->patch('/{actId}', [ActivityController::class, 'update']);
+            $group->delete('/{actId}', [ActivityController::class, 'delete']);
+        });
+    })->add(new AuthMiddleware());
+})->add(new ParserMiddleware());

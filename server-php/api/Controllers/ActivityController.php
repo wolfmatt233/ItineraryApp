@@ -1,60 +1,94 @@
 <?php
 
-namespace ItineraryApi\Controllers;
+namespace Api\Controllers;
 
-use ItineraryApi\Models\Activity;
-use ItineraryApi\Utils\IdentifierFormatter;
-use ItineraryApi\Utils\InputValidator;
+use Api\Models\Activity;
+use Api\Models\Itinerary;
+use Api\Utils\Converter;
+use Api\Utils\Utils;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 class ActivityController
 {
-    public $requiredFields = ['date', 'activity', 'notes', 'location_name', 'location_lat', 'location_lon'];
+    public $requiredFields = ['date', 'activity', 'location_name', 'location_lat', 'location_lon'];
 
-    public function index($id, $userId)
+    public function index(Request $request, Response $response, array $args)
     {
-        $res = Activity::getActivities($id, $userId);
-        $res = $res->toArray();
+        $uid = $request->getAttribute('userId');
+        $activities = Activity::getActivitiesByItinerary($args['id'], $uid);
 
-        $resCamelCase = array_map(function ($item) {
-            return IdentifierFormatter::convertArrayKeysToCamelCase($item);
-        }, $res);
-
-        return ['status' => 200, 'data' => $resCamelCase];
+        return Utils::jsonResponse(
+            $response,
+            Converter::convertArrayofObjects($activities)
+        );
     }
 
-    public function view($id)
+    public function view(Request $request, Response $response, array $args)
     {
-        $res = Activity::getActivity($id);
-        $attributes = $res->getAttributes();
+        $uid = $request->getAttribute('userId');
+        $activity = Activity::getActivityById($args['actId'], $args['id'], $uid);
 
-        $resCamelCase = IdentifierFormatter::convertArrayKeysToCamelCase($attributes);
-        return ['status' => 200, 'data' => $resCamelCase];
+        return Utils::jsonResponse($response, Converter::convertObject($activity));
     }
 
-    public function create($id, $userId)
+    public function create(Request $request, Response $response, array $args)
     {
-        InputValidator::emptyInputs($this->requiredFields);
-        $res = Activity::createActivity($id, $userId);
-        $attributes = $res->getAttributes();
+        $body = Converter::convertKeysToSnakeCase($request->getParsedBody());
+        $itineraryId = $args['id'];
+        $uid = $request->getAttribute('userId');
 
-        $resCamelCase = IdentifierFormatter::convertArrayKeysToCamelCase($attributes);
-        return ['status' => 200, 'data' => $resCamelCase];
+        // Check if itinerary belongs to the user
+        $itinerary = Itinerary::getItineraryById($itineraryId, $uid);
+
+        if (!$itinerary) {
+            return Utils::errorResponse($response, 'Itinerary not found', 404);
+        }
+
+        // Validate inputs
+        $validated = Utils::validateInputs($response, $this->requiredFields, $body);
+
+        if (!$validated) {
+            return $response;
+        }
+
+        // Create activity
+        $activity = Activity::createActivity($itineraryId, $body);
+        return Utils::jsonResponse($response, Converter::convertObject($activity));
     }
 
-    public function update($id, $userId)
+    public function update(Request $request, Response $response, array $args)
     {
-        InputValidator::emptyInputs($this->requiredFields);
+        $body = Converter::convertKeysToSnakeCase($request->getParsedBody());
+        $itineraryId = $args['id'];
+        $uid = $request->getAttribute('userId');
 
-        $res = Activity::updateActivity($id, $userId);
-        $attributes = $res->getAttributes();
+        // Validate inputs
+        $validated = Utils::validateInputs($response, $this->requiredFields, $body);
 
-        $resCamelCase = IdentifierFormatter::convertArrayKeysToCamelCase($attributes);
-        return ['status' => 200, 'data' => $resCamelCase];
+        if (!$validated) {
+            return $response;
+        }
+
+        // Update activity
+        $activity = Activity::updateActivity($args['actId'], $itineraryId, $uid, $body);
+
+        if (!$activity) {
+            return Utils::errorResponse($response, 'Itinerary not found', 404);
+        }
+
+        return Utils::jsonResponse($response, Converter::convertObject($activity));
     }
 
-    public function delete($id, $userId)
+    public function delete(Request $request, Response $response, array $args)
     {
-        Activity::deleteActivity($id, $userId);
-        return ['status' => 200, 'data' => ['message' => 'Activity successfully deleted']];
+        $uid = $request->getAttribute('userId');
+        $result = Activity::deleteActivity($args['actId'], $args['id'], $uid);
+
+        if (!$result) {
+            return Utils::errorResponse($response, 'Activity not found', 404);
+        }
+
+        return Utils::jsonResponse($response, ['message' => 'Activity successfully deleted']);
     }
 }

@@ -1,9 +1,8 @@
 <?php
 
-namespace ItineraryApi\Models;
+namespace Api\Models;
 
 use Illuminate\Database\Eloquent\Model as Model;
-use ItineraryApi\Utils\UnauthorizedException;
 
 class Activity extends Model
 {
@@ -13,53 +12,72 @@ class Activity extends Model
 
     protected $hidden = ['created_at', 'updated_at'];
 
-    public static function getActivities($id, $userId)
+    public function itinerary()
     {
-        Itinerary::getItinerary($id, $userId); // Throw exception if user does not match
-        return self::where('itinerary_id', $id)->get();
+        return $this->belongsTo(Itinerary::class, 'id');
     }
 
-    public static function getActivity($id)
+    public static function getActivitiesByItinerary($itineraryId, $userId)
     {
-        return self::findOrFail($id);
+        // Get the activities that belong to the itinerary AND the current user 
+        return self::join('itineraries', 'activities.itinerary_id', '=', 'itineraries.id')
+            ->where('activities.itinerary_id', $itineraryId)
+            ->where('itineraries.user_id', $userId)
+            ->get(['activities.*']);
     }
 
-    public static function createActivity($id, $userId)
+    public static function getActivityById($id, $itineraryId, $userId)
     {
-        Itinerary::getItinerary($id, $userId); // Throw exception if user does not match
+        // Get the activity that belongs to the itinerary AND the current user 
+        return self::join('itineraries', 'activities.itinerary_id', '=', 'itineraries.id')
+            ->where('activities.itinerary_id', $itineraryId)
+            ->where('activities.id', $id)
+            ->where('itineraries.user_id', $userId)
+            ->first(['activities.*']);
+    }
 
+    public static function createActivity($itineraryId, $body)
+    {
         $activity = new Activity();
-        $activity->itinerary_id = $id;
-        $activity->date = $_REQUEST['date'];
-        $activity->activity = $_REQUEST['activity'];
-        $activity->notes = $_REQUEST['notes'];
-        $activity->completed = false;
-        $activity->location_name = $_REQUEST['location_name'];
-        $activity->location_lat = $_REQUEST['location_lat'];
-        $activity->location_lon = $_REQUEST['location_lon'];
+        $activity->itinerary_id = $itineraryId;
+        $activity->date = $body['date'];
+        $activity->activity = $body['activity'];
+        $activity->notes = $body['notes'];
+        $activity->completed = $body['completed'];
+        $activity->location_name = $body['location_name'];
+        $activity->location_lat = $body['location_lat'];
+        $activity->location_lon = $body['location_lon'];
         $activity->save();
 
         return $activity;
     }
 
-    public static function updateActivity($id, $userId)
+    public static function updateActivity($id, $itineraryId, $userId, $body)
     {
-        $activity = self::findOrFail($id);
-        Itinerary::getItinerary($activity->itinerary_id, $userId);
+        $activity = self::getActivityById($id, $itineraryId, $userId);
 
-        foreach ($_REQUEST as $field => $value) {
+        if (!$activity) {
+            return false;
+        }
+
+        foreach ($body as $field => $value) {
             $activity->$field = $value;
         }
 
         $activity->save();
+
         return $activity;
     }
 
-    public static function deleteActivity($id, $userId)
+    public static function deleteActivity($id, $itineraryId, $userId)
     {
-        $activity = self::findOrFail($id);
-        Itinerary::getItinerary($activity->itinerary_id, $userId);
+        $activity = self::getActivityById($id, $itineraryId, $userId);
 
-        return $activity->delete();
+        if (!$activity) {
+            return false;
+        }
+
+        $activity->delete();
+        return true;
     }
 }

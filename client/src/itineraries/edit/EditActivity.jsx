@@ -48,7 +48,7 @@ export default function EditActivity({ activityId, setActivityId }) {
       date: `${datetime.date}T${datetime.time}:00`,
     };
 
-    const res = await updateActivity(activityWithTime._id, activityWithTime);
+    const res = await updateActivity(itinerary._id, activityWithTime._id, activityWithTime);
     const { response, data } = res;
 
     if (response.ok) {

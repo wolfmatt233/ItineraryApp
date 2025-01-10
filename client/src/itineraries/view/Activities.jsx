@@ -6,9 +6,9 @@ import {
   useRef,
   useState,
 } from "react";
-import ActivityMap from "./ActivityMap";
+import ActivityMap from "./map/ActivityMap";
 import ActivityList from "./ActivityList";
-import MapButtons from "./MapButtons";
+import MapButtons from "./map/MapButtons";
 import DeleteActivity from "../delete/DeleteActivity";
 import { useItinerary } from "../../pages/itinerary/Itinerary";
 import { sortDates } from "../functions/mapFunctions";

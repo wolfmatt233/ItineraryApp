@@ -26,7 +26,10 @@ export default function EditInfo() {
   };
 
   const handleSave = async () => {
-    const res = await updateItinerary(id, updatedItinerary);
+    let sentItinerary = { ...updatedItinerary };
+    delete sentItinerary.activities;
+
+    const res = await updateItinerary(id, sentItinerary);
     const { response, data } = res;
 
     if (response.ok) {
@@ -119,7 +122,7 @@ export default function EditInfo() {
             className="site-green size-fit text-white flex items-center rounded-md mt-6 px-3 h-[40px] hover:site-yellow"
             onClick={() => setShowCalendar((prev) => !prev)}
           >
-            <i class="fa-solid fa-map-location"></i>
+            <i className="fa-solid fa-map-location"></i>
           </button>
         )}
       </div>

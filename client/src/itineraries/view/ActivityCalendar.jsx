@@ -5,7 +5,9 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 const localizer = momentLocalizer(moment);
 
 export default function ActivityCalendar({ itinerary, setActivityId }) {
-  const calendarEvents = itinerary.activities.map((activity) => ({
+  const activities = itinerary.activities || [];
+
+  const calendarEvents = activities.map((activity) => ({
     title: activity.activity,
     start: new Date(activity.date),
     end: new Date(activity.date),
@@ -17,13 +19,14 @@ export default function ActivityCalendar({ itinerary, setActivityId }) {
     },
   }));
 
-  const earliestDate = new Date(
-    Math.min(
-      ...itinerary.activities.map((activity) =>
-        new Date(activity.date).getTime()
-      )
-    )
-  );
+  const earliestDate =
+    activities.length > 0
+      ? new Date(
+          Math.min(
+            ...activities.map((activity) => new Date(activity.date).getTime())
+          )
+        )
+      : new Date(itinerary.startDate); // Default to today if no activities
 
   // TODO: Show edit modal on event click
 

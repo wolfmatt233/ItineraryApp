@@ -1,55 +1,80 @@
 <?php
 
-namespace ItineraryApi\Controllers;
+namespace Api\Controllers;
 
-use ItineraryApi\Models\Token;
-use ItineraryApi\Models\User;
-use ItineraryApi\Utils\InputValidator;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
+use Api\Models\Token;
+use Api\Models\User;
+use Api\Utils\Utils;
 
 class UserController
 {
-    public $requiredFields = ['username', 'email', 'password'];
-
-    public function index()
+    public function view(Request $request, Response $response, array $args)
     {
-        $res = User::getUsers();
-        return ['status' => 200, 'data' => ['items' => $res]];
-    }
+        // Only view user from JWT user id
+        $uid = $request->getAttribute('userId');
+        $user = User::getUserByUid($uid);
 
-    public function account($userId)
-    {
-        $res = User::getAccount($userId);
-        return ['status' => 200, 'data' => $res];
-    }
-
-    public function view($id)
-    {
-        $res = User::getUser($id);
-        return ['status' => 200, 'data' => $res];
-    }
-
-    public function create()
-    {
-        // TODO: Log in when user is created
-        InputValidator::emptyInputs($this->requiredFields);
-        $res = User::createUser();
-        if ($res) {
-            Token::createToken($res['id']);
+        if (!$user) {
+            return Utils::errorResponse($response, 'User not found', 404);
         }
-        return ['status' => 200, 'data' => $res];
+
+        return Utils::jsonResponse($response, $user);
     }
 
-    public function update($id, $userId)
+    public function create(Request $request, Response $response, array $args)
     {
-        InputValidator::emptyInputs($this->requiredFields);
+        $body = $request->getParsedBody();
+        $requiredFields = ['username', 'email', 'password'];
 
-        $res = User::updateUser($id, $userId);
-        return ['status' => 200, 'data' => $res];
+        $validated = Utils::validateInputs($response, $requiredFields, $body);
+
+        if (!$validated) {
+            return $response;
+        }
+
+        $emailValid = User::getUserByEmail($body['email']);
+
+        if ($emailValid !== null) {
+            return Utils::errorResponse($response, 'Email already in use', 401);
+        }
+
+        // Generate new user
+        $userId = User::createUser($body);
+        if (!is_int($userId)) {
+            return Utils::errorResponse($response, '', 500);
+        }
+
+        // Generate token entry for user
+        $tokenId = Token::createToken($userId);
+        if (!is_int($tokenId)) {
+            return Utils::errorResponse($response, '', 500);
+        }
+
+        return Utils::jsonResponse($response, 'Account successfully created');
     }
 
-    public function delete($id, $userId)
+    public function update(Request $request, Response $response, array $args)
     {
-        User::deleteUser($id, $userId);
-        return ['status' => 200, 'message' => 'User successfully deleted'];
+        $body = $request->getParsedBody();
+        $uid = $request->getAttribute('userId');
+        $validated = Utils::validateInputs($response, ['newPassword'], $body);
+
+        if (!$validated) {
+            return $response;
+        }
+
+        User::updatePassword($uid, newPassword: $body['newPassword']);
+
+        return Utils::jsonResponse($response, ['message' => 'Password updated']);
+    }
+
+    public function delete(Request $request, Response $response, array $args)
+    {
+        $uid = $request->getAttribute('userId');
+        User::deleteUser($uid);
+
+        return Utils::jsonResponse($response, ['message' => 'Account successfully deleted']);
     }
 }

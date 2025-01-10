@@ -10,7 +10,7 @@ export default function DeleteActivity({ modal }) {
   const handleDelete = async (e) => {
     e.preventDefault();
 
-    const res = await deleteActivity(modal);
+    const res = await deleteActivity(itinerary._id, modal);
     const { response, data } = res;
 
     if (response.ok) {

@@ -1,26 +1,39 @@
 <?php
 
-namespace ItineraryApi\Controllers;
+namespace Api\Controllers;
 
+use Api\Models\Token;
+use Api\Models\User;
+use Api\Utils\Utils;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use ItineraryApi\Models\Token;
-use ItineraryApi\Models\User;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 class AuthController
 {
-    public $secret;
-
-    public function __construct()
+    public function login(Request $request, Response $response)
     {
-        $this->secret = $_ENV['JWT_SECRET'];
-    }
+        $body = $request->getParsedBody();
+        $formEmail = $body['email'];
+        $formPassword = $body['password'];
 
-    public function login()
-    {
-        $user = User::getUserByEmail($_REQUEST['email']);
+        $requiredFields = ['email', 'password'];
+        $validated = Utils::validateInputs($response, $requiredFields, $body);
 
-        if (password_verify($_REQUEST['password'], $user['password'])) {
+        if (!$validated) {
+            return;
+        }
+
+        // Find user
+        $user = User::getUserByEmail($formEmail);
+
+        if (!$user) {
+            return Utils::errorResponse($response, 'Invalid email', 401);
+        }
+
+        // Compare passwords
+        if (password_verify($formPassword, $user['password'])) {
             $refreshPayload = [
                 'issued_at' => time(),
                 'expires_at' => time() + (7 * 24 * 60 * 60),
@@ -33,66 +46,81 @@ class AuthController
                 'user' => $user['id'],
             ];
 
-            $refreshToken = JWT::encode($refreshPayload, $this->secret, 'HS256');
-            $accessToken = JWT::encode($accessPayload, $this->secret, 'HS256');
+            $refreshToken = JWT::encode($refreshPayload, $_ENV['JWT_SECRET'], 'HS256');
+            $accessToken = JWT::encode($accessPayload, $_ENV['JWT_SECRET'], 'HS256');
 
             Token::updateToken($user['id'], $refreshToken);
-
-            return [
-                'status' => 200,
-                'data' => [
-                    'refreshToken' => $refreshToken,
-                    'accessToken' => $accessToken,
-                ]
-            ];
+        } else {
+            return Utils::errorResponse($response, 'Invalid password', 401);
         }
+
+        return Utils::jsonResponse($response, [
+            'message' => 'Login successful',
+            'refreshToken' => $refreshToken,
+            'accessToken' => $accessToken
+        ]);
     }
 
-    public function refreshToken()
+    public function refreshToken(Request $request, Response $response)
     {
-        $refreshToken = str_replace('Bearer ', '', $_SERVER['HTTP_AUTHORIZATION']);
+        $authHeader = $request->getHeader('Authorization');
 
-        // decrypt token
-        $decodedRefresh = JWT::decode($refreshToken, new Key($this->secret, 'HS256'));
-        $userId = $decodedRefresh->user;
-        $expiresAt = $decodedRefresh->expires_at;
-
-        if ($expiresAt < time()) {
-            return ['status' => 403, 'message' => 'Refresh token expired'];
+        if (empty($authHeader)) {
+            return Utils::errorResponse($response, 'Authorization header missing', 401);
         }
 
-        $storedToken = Token::getToken($userId);
-        $tokenMatch = Token::verifyToken($refreshToken, $storedToken['refresh_token']);
+        // Decrypt refresh token
+        $refreshToken = str_replace('Bearer ', '', $authHeader[0]);
 
-        if ($storedToken && $tokenMatch) {
+        if (!$refreshToken) {
+            return Utils::errorResponse($response, 'Authorization header invalid', 403);
+        }
+
+        try {
+            $decodedJwt = JWT::decode($refreshToken, new Key($_ENV['JWT_SECRET'], 'HS256'));
+        } catch (\Exception $e) {
+            return Utils::errorResponse($response, 'Invalid token', 403);
+        }
+
+        $uid = $decodedJwt->user;
+
+        // Expired token
+        if ($decodedJwt->expires_at < time()) {
+            return Utils::errorResponse($response, 'Access token expired', 401);
+        }
+
+        // Verify token by matching from db
+        $storedToken = Token::getTokenByUid($uid);
+        $tokenMatch = password_verify($refreshToken, $storedToken['refresh_token']);
+
+        if ($tokenMatch || $storedToken) {
             // Keep original expiration but generate a new token
             $refreshPayload = [
                 'issued_at' => time(),
-                'expires_at' => $expiresAt,
-                'user' => $userId,
+                'expires_at' => $decodedJwt->expires_at,
+                'user' => $uid,
             ];
 
             // New access token
             $accessPayload = [
                 'issued_at' => time(),
                 'expires_at' => time() + 3600,
-                'user' => $userId,
+                'user' => $uid,
             ];
 
-            $newRefreshToken = JWT::encode($refreshPayload, $this->secret, 'HS256');
-            $newAccessToken = JWT::encode($accessPayload, $this->secret, 'HS256');
+            $newRefreshToken = JWT::encode($refreshPayload, $_ENV['JWT_SECRET'], 'HS256');
+            $newAccessToken = JWT::encode($accessPayload, $_ENV['JWT_SECRET'], 'HS256');
 
-            Token::updateToken($userId, $newRefreshToken);
+            Token::updateToken($uid, $newRefreshToken);
 
-            return [
-                'status' => 200,
-                'data' => [
-                    'refreshToken' => $newRefreshToken,
-                    'accessToken' => $newAccessToken
-                ]
-            ];
+            return Utils::jsonResponse($response, [
+                'message' => 'Token refreshed',
+                'refreshToken' => $newRefreshToken,
+                'accessToken' => $newAccessToken
+            ]);
         } else {
-            throw new \Exception('Invalid or expired token', 403);
+            $message = ['error' => 'Invalid refresh token'];
+            return Utils::errorResponse($response, 'Invalid refresh token', 401);
         }
     }
 }

@@ -64,8 +64,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    getUser();
-    // setLoading(false);
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    if (accessToken && refreshToken) {
+      getUser();
+    } else {
+      logout();
+    }
   }, []);
 
   return (

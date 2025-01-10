@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../Models/User.js";
 import authMiddleware from "../Middleware/authMiddleware.js";
+import reAuthMiddleware from "../Middleware/reAuthMiddleware.js";
 
 const router = Router();
 
@@ -92,7 +93,10 @@ const refreshToken = async (req, res) => {
       { expiresIn: "1hr" }
     );
 
-    res.json({ accessToken: newAccessToken });
+    res.json({
+      message: "Refreshed token successfully",
+      accessToken: newAccessToken,
+    });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
@@ -126,30 +130,10 @@ const register = async (req, res) => {
 };
 
 const changePassword = async (req, res) => {
-  const { email, password, newPassword } = req.body;
-  const refreshToken = req.header("Authorization")?.split(" ")[1];
-
-  if (!refreshToken) {
-    return res.status(401).json({ message: "Refresh token is required" });
-  }
+  const { newPassword } = req.body;
 
   try {
-    const decodedToken = jwt.verify(refreshToken, process.env.JWT_SECRET);
-
-    // Find user
-    const user = await User.findOne({ email });
-
-    // No email exists or email does not match current user
-    if (!user || user._id != decodedToken.id) {
-      return res.status(400).json({ message: "Invalid email" });
-    }
-
-    // Compare passwords
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
-    }
+    const user = req.reAuth;
 
     // Change the password
     const newHashedPassword = await bcrypt.hash(newPassword, 10);
@@ -165,29 +149,9 @@ const changePassword = async (req, res) => {
 
 const deleteAccount = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const refreshToken = req.header("Authorization")?.split(" ")[1];
+    const user = req.reAuth;
 
-    if (!refreshToken) {
-      return res.status(401).json({ message: "Refresh token is required" });
-    }
-
-    const decodedToken = jwt.verify(refreshToken, process.env.JWT_SECRET);
-    const user = await User.findOne({ email });
-
-    // No email exists or email does not match current user
-    if (!user || user._id != decodedToken.id) {
-      return res.status(400).json({ message: "Invalid email" });
-    }
-
-    // Compare passwords
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
-    }
-
-    // Delete the account
+    // Delete user
     await user.deleteOne();
 
     res.status(201).json({ message: "Account successfully deleted" });
@@ -198,9 +162,14 @@ const deleteAccount = async (req, res) => {
 
 // Routes
 
-router.get("/user", authMiddleware, getUser); // Protected
-router.post("/change-password", authMiddleware, changePassword); // Protected
-router.delete("/", authMiddleware, deleteAccount); // Protected
+router.get("/", authMiddleware, getUser); // Protected
+router.post(
+  "/change-password",
+  authMiddleware,
+  reAuthMiddleware,
+  changePassword
+); // Protected + re-auth
+router.delete("/", authMiddleware, reAuthMiddleware, deleteAccount); // Protected + re-auth
 router.post("/login", login);
 router.post("/refresh-token", refreshToken);
 router.post("/register", register);

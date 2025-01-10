@@ -30,10 +30,9 @@ export default function User() {
 
       if (response.ok) {
         setAction(null);
-        alert("Password changed successfully.");
-      } else {
-        alert(data.message);
       }
+
+      alert(data.message || data.error);
     } else if (action === "delete") {
       // send current info to confirm & delete
       const res = await deleteAccount(formData);
@@ -44,7 +43,7 @@ export default function User() {
         logout();
       }
 
-      alert(data.message);
+      alert(data.message || data.error);
     }
   };
 
@@ -112,7 +111,7 @@ export default function User() {
                 className="basic-button"
                 onClick={handleSubmit}
               >
-                Log In
+                { action == "password" ? "Update Password" : "Delete Account"}
               </button>
             </form>
           </div>

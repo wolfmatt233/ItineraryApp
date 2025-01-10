@@ -1,6 +1,6 @@
 <?php
 
-namespace ItineraryApi\Models;
+namespace Api\Models;
 
 use Illuminate\Database\Eloquent\Model as Model;
 
@@ -10,36 +10,29 @@ class Token extends Model
 
     protected $primaryKey = 'id';
 
-    protected $hidden = ['created_at', 'updated_at'];
-
-    public function user()
+    public function token()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public static function getToken($id)
+    public static function getTokenByUid($userId)
     {
-        return self::where('user_id', $id)->first();
+        return self::where('user_id', $userId)->first();
     }
 
-    public static function createToken($id, $refreshToken = null)
+    public static function createToken($id)
     {
         $token = new Token();
         $token->user_id = $id;
-        $token->refresh_token = password_hash($refreshToken, PASSWORD_DEFAULT);
+        $token->refresh_token = "";
         $token->save();
 
-        return $token;
+        return $token['id'];
     }
 
-    public static function verifyToken($refreshToken, $storedToken)
+    public static function updateToken($userId, $refreshToken)
     {
-        return password_verify($refreshToken, $storedToken);
-    }
-
-    public static function updateToken($id, $refreshToken)
-    {
-        $token = self::getToken($id);
+        $token = self::getTokenByUid($userId);
         $token->refresh_token = password_hash($refreshToken, PASSWORD_DEFAULT);
         $token->save();
 

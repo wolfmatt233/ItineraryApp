@@ -11,7 +11,7 @@ export const activityRequests = () => {
   const createActivity = async (id, activity) => {
     setPageLoading(true);
     const fetchFunction = (id, activity) =>
-      fetch(`${apiUrl}/activities/${id}`, {
+      fetch(`${apiUrl}/itineraries/${id}/activities`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -34,10 +34,10 @@ export const activityRequests = () => {
     return retryForbidden(fetchFunction, [id]);
   };
 
-  const updateActivity = async (id, activity) => {
+  const updateActivity = async (itineraryId, actId, activity) => {
     setPageLoading(true);
-    const fetchFunction = (id, activity) =>
-      fetch(`${apiUrl}/activities/${id}`, {
+    const fetchFunction = (itineraryId, actId, activity) =>
+      fetch(`${apiUrl}/itineraries/${itineraryId}/activities/${actId}`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -46,20 +46,20 @@ export const activityRequests = () => {
         body: JSON.stringify(activity),
       });
 
-    return retryForbidden(fetchFunction, [id, activity]);
+    return retryForbidden(fetchFunction, [itineraryId, actId, activity]);
   };
 
-  const deleteActivity = async (id) => {
+  const deleteActivity = async (itineraryId, actId) => {
     setPageLoading(true);
     const fetchFunction = (id) =>
-      fetch(`${apiUrl}/activities/${id}`, {
+      fetch(`${apiUrl}/itineraries/${itineraryId}/activities/${actId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
 
-    return retryForbidden(fetchFunction, [id]);
+    return retryForbidden(fetchFunction, [itineraryId, actId]);
   };
 
   return {

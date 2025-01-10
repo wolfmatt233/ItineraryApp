@@ -19,6 +19,8 @@ export const AuthProvider = ({ children }) => {
     } else if (response.status === 403) {
       // try to refresh expired token with a new one
       refreshLogin();
+    } else {
+      logout();
     }
   };
 

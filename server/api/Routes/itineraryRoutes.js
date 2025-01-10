@@ -127,21 +127,6 @@ const deleteItinerary = async (req, res) => {
   }
 };
 
-const getActivitiesByItinerary = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const activities = await Activity.find({
-      userId: req.user.id,
-      itineraryId: id,
-    });
-
-    res.status(200).json(activities);
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
 // Routes, all auth protected
 
 router.get("/", authMiddleware, getItineraries);
@@ -149,6 +134,5 @@ router.get("/:id", authMiddleware, getItineraryById);
 router.post("/", authMiddleware, createItinerary);
 router.patch("/:id", authMiddleware, updateItinerary);
 router.delete("/:id", authMiddleware, deleteItinerary);
-router.get("/:id/activities", authMiddleware, getActivitiesByItinerary); // activities
 
 export default router;

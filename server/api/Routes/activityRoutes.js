@@ -3,9 +3,24 @@ import authMiddleware from "../Middleware/authMiddleware.js";
 import Activity from "../Models/Activity.js";
 import { hasEmptyInputs } from "../Utils/emptyInputs.js";
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
-// Activities CUD
+// Activities CRUD
+
+const getActivitiesByItinerary = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const activities = await Activity.find({
+      userId: req.user.id,
+      itineraryId: id,
+    });
+
+    res.status(200).json(activities);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 
 const createActivity = async (req, res) => {
   const { id } = req.params;
@@ -33,12 +48,12 @@ const createActivity = async (req, res) => {
 
     res.status(201).json(newActivity);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
 const updateActivity = async (req, res) => {
-  const { id } = req.params;
+  const { id, actId } = req.params;
   const { date, locationName, locationLat, locationLon, notes, completed } =
     req.body;
 
@@ -50,7 +65,8 @@ const updateActivity = async (req, res) => {
     // Find activity to update
     const activity = await Activity.findOne({
       userId: req.user.id,
-      _id: id,
+      itineraryId: id,
+      _id: actId,
     });
 
     if (!activity) {
@@ -71,19 +87,19 @@ const updateActivity = async (req, res) => {
 
     res.status(200).json(updatedActivity);
   } catch (error) {
-    console.log("ERROR", error);
-    res.status(500).json({ message: "Error updating activity", error: error });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
 const deleteActivity = async (req, res) => {
-  const { id } = req.params;
+  const { id, actId } = req.params;
 
   try {
     // Find activity to update
     const activity = await Activity.findOne({
       userId: req.user.id,
-      _id: id,
+      _id: actId,
+      itineraryId: id,
     });
 
     if (!activity) {
@@ -93,15 +109,15 @@ const deleteActivity = async (req, res) => {
     await activity.deleteOne();
     res.status(200).json({ message: "Successfully deleted activity" });
   } catch (error) {
-    console.log("ERROR", error);
-    res.status(500).json({ message: "Error deleting activity" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
 // Routes, all auth protected
 
-router.post("/:id", authMiddleware, createActivity);
-router.patch("/:id", authMiddleware, updateActivity);
-router.delete("/:id", authMiddleware, deleteActivity);
+router.get("/", authMiddleware, getActivitiesByItinerary);
+router.post("/", authMiddleware, createActivity);
+router.patch("/:actId", authMiddleware, updateActivity);
+router.delete("/:actId", authMiddleware, deleteActivity);
 
 export default router;

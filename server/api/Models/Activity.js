@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 const activitySchema = new mongoose.Schema(
   {
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    itineraryId: { type: mongoose.Schema.Types.ObjectId, ref: "Itinerary" },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    itineraryId: { type: mongoose.Schema.Types.ObjectId, ref: "Itinerary", required: true },
     date: { type: String, required: true },
     activity: { type: String, required: true },
     locationName: { type: String, required: true },

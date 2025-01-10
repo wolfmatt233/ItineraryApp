@@ -163,8 +163,8 @@ const deleteAccount = async (req, res) => {
 // Routes
 
 router.get("/", authMiddleware, getUser); // Protected
-router.post(
-  "/change-password",
+router.patch(
+  "/update-password",
   authMiddleware,
   reAuthMiddleware,
   changePassword

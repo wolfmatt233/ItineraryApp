@@ -21,8 +21,8 @@ class AuthController
         $requiredFields = ['email', 'password'];
         $validated = Utils::validateInputs($response, $requiredFields, $body);
 
-        if (!$validated) {
-            return;
+        if ($validated !== true) {
+            return $validated;
         }
 
         // Find user

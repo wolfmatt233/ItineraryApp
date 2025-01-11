@@ -29,7 +29,7 @@ export default function SignUp() {
     if (response.ok) {
       await login(formData);
     } else {
-      alert("Sign up failed");
+      alert(`Error ${response.status}: ${data.error}`);
     }
   };
 
@@ -58,11 +58,7 @@ export default function SignUp() {
           className="basic-input"
           onChange={handleChange}
         />
-        <button
-          type="submit"
-          className="basic-button"
-          onClick={signUp}
-        >
+        <button type="submit" className="basic-button" onClick={signUp}>
           Sign Up
         </button>
 

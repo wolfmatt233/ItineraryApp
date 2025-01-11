@@ -22,7 +22,7 @@ export default function DeleteActivity({ modal }) {
       setItinerary(updatedItinerary);
       setModal(false);
     } else {
-      alert("Deletion failed.");
+      alert(`Error ${response.status}: ${data.error}`);
     }
   };
 

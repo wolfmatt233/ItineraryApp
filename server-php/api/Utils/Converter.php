@@ -7,8 +7,12 @@ class Converter
     public static function convertArrayofObjects($array)
     {
         $array = $array->toArray();
-        $convertedArray = [];
 
+        if (!is_array($array)) {
+            return;
+        }
+
+        $convertedArray = [];
         foreach ($array as $key => $value) {
             $convertedArray[] = self::convertKeysToCamelCase($value);
         }
@@ -28,6 +32,10 @@ class Converter
 
     public static function convertKeysToCamelCase($array)
     {
+        if (!is_array($array)) {
+            return;
+        }
+
         $convertedArray = [];
         foreach ($array as $key => $value) {
             // Convert each key to camelCase and add it to the new array
@@ -52,6 +60,10 @@ class Converter
 
     public static function convertTimeKeys($array)
     {
+        if (!is_array($array)) {
+            return;
+        }
+
         $convertedArray = $array;
         foreach ($array as $key => $value) {
             if ($key === "date") {
@@ -66,6 +78,10 @@ class Converter
     // camel to snake
     public static function convertKeysToSnakeCase($array)
     {
+        if (!is_array($array)) {
+            return;
+        }
+
         $convertedArray = [];
         foreach ($array as $key => $value) {
             // Convert the key to snake_case

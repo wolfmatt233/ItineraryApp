@@ -4,15 +4,21 @@
 
 An itenerary website that allows you to create an itenerary on a day by day basis. Scheduling and times can be laid out. Use of a map to select locations to add.
 
-## Tech Stack
+## Tech Stack (Express api)
 
 - Database: MongoDB
 - Server Framework: ExpressJS
-- Frontend: React (via Vite)
 - Server: Node
+
+## Tech Stack (PHP api)
+
+- Database: MySQL using Eloquent ORM
+- Server Framework: Slim
+- Server: Apache via XAMPP
 
 ## Other Tech & Libraries
 
+- Frontend: React (via Vite)
 - Leaflet Maps API
 - React Big Calendar
 
@@ -62,4 +68,4 @@ An itenerary website that allows you to create an itenerary on a day by day basi
 
 ## PHP Api
 
-I added a PHP version of the api for my own practice that works the same, just using MySQL and a custom PHP router. I originally created the front end to work with MongoDB so, there are some features within the front end to help data from the PHP api work with the client. Primarily I added an identifier, _id, to JSON objects that come from the PHP api.
+I added a PHP version of the api for my own practice that works the same, just using MySQL and a custom PHP router. I originally created the front end to work with MongoDB so, there are some features within the front end to help data from the PHP api work with the client. Primarily I added an identifier, \_id, to JSON objects that come from the PHP api.

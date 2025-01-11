@@ -29,7 +29,7 @@ export default function CreateItinerary() {
     if (response.ok) {
       setPage(`itinerary:${data._id}`);
     } else {
-      alert(data.message);
+      alert(`Error ${response.status}: ${data.error}`);
     }
   };
 

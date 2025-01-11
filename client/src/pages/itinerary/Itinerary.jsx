@@ -23,21 +23,22 @@ export default function Itinerary({ id }) {
   const [activityId, setActivityId] = useState(false);
 
   const getItinerary = async () => {
-    const res = await fetchItinerary(id);
-    const { response, data } = res;
-    const res2 = await fetchActivities(id);
+    const itinRes = await fetchItinerary(id);
+    const actRes = await fetchActivities(id);
 
     const combinedItinerary = {
-      ...data,
-      activities: res2.data,
+      ...itinRes.data,
+      activities: actRes.data,
     };
 
-    if (response.ok) {
+    if (itinRes.response.ok && actRes.response.ok) {
       setItinerary(combinedItinerary);
       setLoading(false);
     } else {
+      const status = itinRes.response.status || actRes.response.status;
+      const error = itinRes.data.error || actRes.data.error;
       setPage("itineraries");
-      alert("Couldn't find that itinerary.");
+      alert(`Error ${status}: ${error}`);
     }
   };
 

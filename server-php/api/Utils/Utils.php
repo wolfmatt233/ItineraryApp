@@ -21,14 +21,12 @@ class Utils
     public static function validateInputs(Response $response, $requiredFields, $body)
     {
         if (!is_array($body)) {
-            self::errorResponse($response, 'Invalid or missing input data', 400);
-            return false;
+            return self::errorResponse($response, 'Invalid or missing input data', 400);
         }
 
         foreach ($requiredFields as $field) {
             if (!isset($body[$field]) || empty($body[$field])) {
-                self::errorResponse($response, 'Invalid or missing input data', 400);
-                return false;
+                return self::errorResponse($response, 'Invalid or missing input data', 400);
             }
         }
 

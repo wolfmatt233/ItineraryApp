@@ -48,7 +48,11 @@ export default function EditActivity({ activityId, setActivityId }) {
       date: `${datetime.date}T${datetime.time}:00`,
     };
 
-    const res = await updateActivity(itinerary._id, activityWithTime._id, activityWithTime);
+    const res = await updateActivity(
+      itinerary._id,
+      activityWithTime._id,
+      activityWithTime
+    );
     const { response, data } = res;
 
     if (response.ok) {
@@ -61,6 +65,8 @@ export default function EditActivity({ activityId, setActivityId }) {
 
       setItinerary(updatedItinerary);
       setActivityId(false);
+    } else {
+      alert(`Error ${response.status}: ${data.error}`);
     }
   };
 

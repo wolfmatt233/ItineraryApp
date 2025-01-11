@@ -65,7 +65,7 @@ export default function AddForm({ setLocation, location }) {
       setItinerary(updatedItinerary);
       handleClose();
     } else {
-      alert("Failed to add activity.");
+      alert(`Error ${response.status}: ${data.error}`);
     }
   };
 

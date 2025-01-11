@@ -30,7 +30,6 @@ export const apiRequests = () => {
       return { response, data: addUnderscoreId(data) };
     } catch (error) {
       setPageLoading(false);
-      console.log(error);
     }
   };
 

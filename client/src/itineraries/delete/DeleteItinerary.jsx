@@ -18,7 +18,7 @@ export default function DeleteItinerary({
       setItineraries((prev) => prev.filter((item) => item._id != id));
       setModal(false);
     } else {
-      alert("Failed to delete itinerary.");
+      alert(`Error ${response.status}: ${data.error}`);
     }
   };
 

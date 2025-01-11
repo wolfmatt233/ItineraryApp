@@ -5,6 +5,7 @@ use Api\Controllers\AuthController;
 use Api\Controllers\ItineraryController;
 use Api\Controllers\UserController;
 use Api\Middleware\AuthMiddleware;
+use Api\Middleware\LoggingMiddleware;
 use Api\Middleware\ReAuthMiddleware;
 use Slim\Routing\RouteCollectorProxy as Group;
 use Slim\Middleware\BodyParsingMiddleware as ParserMiddleware;
@@ -46,4 +47,6 @@ $app->group('/api', function (Group $group) {
             $group->delete('/{actId}', [ActivityController::class, 'delete']);
         });
     })->add(new AuthMiddleware());
-})->add(new ParserMiddleware());
+})
+    ->add(new ParserMiddleware())
+    ->add(new LoggingMiddleware());

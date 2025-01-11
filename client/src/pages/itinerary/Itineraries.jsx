@@ -17,10 +17,11 @@ export default function Itineraries() {
     const res = await fetchItineraries();
     const { response, data } = res;
 
-    if (!data) {
-      setPage(`error:${data.message}`);
-    } else {
+    if (response.ok && data) {
       setItineraries(data);
+    } else {
+      alert(`Error ${response.status}: ${data.error}`);
+      setItineraries([]);
     }
 
     setLoading(false);
@@ -43,40 +44,44 @@ export default function Itineraries() {
           onClick={() => setEdit((prev) => !prev)}
         ></i>
       </div>
-      {itineraries.map((item, idx) => (
-        <div key={idx} className="flex border-b">
-          <button
-            className="list-button"
-            onClick={() => setPage(`itinerary:${item._id}`)}
-          >
-            <div className="flex items-center">
-              <i className="fa-solid fa-location-dot mr-2"></i>
-              <p className="text-lg py-2">{item.title}</p>
-            </div>
+      {itineraries.length > 0 ? (
+        itineraries.map((item, idx) => (
+          <div key={idx} className="flex border-b">
+            <button
+              className="list-button"
+              onClick={() => setPage(`itinerary:${item._id}`)}
+            >
+              <div className="flex items-center">
+                <i className="fa-solid fa-location-dot mr-2"></i>
+                <p className="text-lg py-2">{item.title}</p>
+              </div>
 
-            <div className="flex">
-              <p>{formatDate(item.startDate)}</p>
-              <p className="mx-1">-</p>
-              <p>{formatDate(item.endDate)}</p>
-            </div>
-          </button>
-          {edit && (
-            <i
-              className="fa-solid fa-trash delete-button"
-              id={item._id}
-              onClick={() => setModal(item._id)}
-            ></i>
-          )}
-          {modal === item._id && (
-            <DeleteItinerary
-              id={item._id}
-              name={item.title}
-              setModal={setModal}
-              setItineraries={setItineraries}
-            />
-          )}
-        </div>
-      ))}
+              <div className="flex">
+                <p>{formatDate(item.startDate)}</p>
+                <p className="mx-1">-</p>
+                <p>{formatDate(item.endDate)}</p>
+              </div>
+            </button>
+            {edit && (
+              <i
+                className="fa-solid fa-trash delete-button"
+                id={item._id}
+                onClick={() => setModal(item._id)}
+              ></i>
+            )}
+            {modal === item._id && (
+              <DeleteItinerary
+                id={item._id}
+                name={item.title}
+                setModal={setModal}
+                setItineraries={setItineraries}
+              />
+            )}
+          </div>
+        ))
+      ) : (
+        <p>No itineraries found.</p>
+      )}
     </div>
   );
 }

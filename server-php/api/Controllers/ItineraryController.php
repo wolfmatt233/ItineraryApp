@@ -40,8 +40,8 @@ class ItineraryController
         $requiredFields = ['title', 'start_date', 'end_date'];
         $validated = Utils::validateInputs($response, $requiredFields, $body);
 
-        if (!$validated) {
-            return $response;
+        if ($validated !== true) {
+            return $validated;
         }
 
         $itinerary = Itinerary::createItinerary($uid, $body);
@@ -54,6 +54,13 @@ class ItineraryController
         $body = Converter::convertKeysToSnakeCase($request->getParsedBody());
         $id = $args['id'];
         $uid = $request->getAttribute('userId');
+
+        $requiredFields = ['title', 'start_date', 'end_date'];
+        $validated = Utils::validateInputs($response, $requiredFields, $body);
+
+        if ($validated !== true) {
+            return $validated;
+        }
 
         $itinerary = Itinerary::updateItinerary($id, $uid, $body);
 

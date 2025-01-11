@@ -48,8 +48,8 @@ class ActivityController
         // Validate inputs
         $validated = Utils::validateInputs($response, $this->requiredFields, $body);
 
-        if (!$validated) {
-            return $response;
+        if ($validated !== true) {
+            return $validated;
         }
 
         // Create activity
@@ -66,8 +66,8 @@ class ActivityController
         // Validate inputs
         $validated = Utils::validateInputs($response, $this->requiredFields, $body);
 
-        if (!$validated) {
-            return $response;
+        if ($validated !== true) {
+            return $validated;
         }
 
         // Update activity

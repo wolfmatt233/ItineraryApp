@@ -30,8 +30,8 @@ class UserController
 
         $validated = Utils::validateInputs($response, $requiredFields, $body);
 
-        if (!$validated) {
-            return $response;
+        if ($validated !== true) {
+            return $validated;
         }
 
         $emailValid = User::getUserByEmail($body['email']);
@@ -61,8 +61,8 @@ class UserController
         $uid = $request->getAttribute('userId');
         $validated = Utils::validateInputs($response, ['newPassword'], $body);
 
-        if (!$validated) {
-            return $response;
+        if ($validated !== true) {
+            return $validated;
         }
 
         User::updatePassword($uid, newPassword: $body['newPassword']);

@@ -18,9 +18,14 @@ export default function RenderPage({ user, page }) {
       case "itinerary":
         return <Itinerary id={page.split(":")[1]} />;
       case "error":
-        return <Error error={page.split(":")[1]} />;
+        return (
+          <Error
+            error={page.split(":")[1].split("|")[0]}
+            status={page.split("|")[1]}
+          />
+        );
       default:
-        return <Error error="Page not found" />;
+        return <Error error="Page not found" status={404} />;
     }
   } else {
     switch (page) {

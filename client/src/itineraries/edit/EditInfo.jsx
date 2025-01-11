@@ -36,8 +36,7 @@ export default function EditInfo() {
       setItinerary(updatedItinerary);
       setEdit(false);
     } else {
-      cancelEdit();
-      alert("Failed to save info.");
+      alert(`Error ${response.status}: ${data.error}`);
     }
   };
 

@@ -8,7 +8,7 @@ import {
   ZoomControl,
 } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-markercluster";
-import { useItinerary } from "../../pages/itinerary/Itinerary";
+import { useItinerary } from "../Itinerary";
 
 export default function SelectMap({ markers, setLocation, clusterGroupRef }) {
   const { itinerary } = useItinerary();

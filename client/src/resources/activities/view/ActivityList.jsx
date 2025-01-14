@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { convertDate } from "../functions/formatDate";
-import { clickMarker } from "../functions/mapFunctions";
+import { convertDate } from "../../functions/formatDate";
+import { clickMarker } from "../../functions/mapFunctions";
 import { useActivity } from "./Activities";
 
 export default function ActivityList({ activities }) {

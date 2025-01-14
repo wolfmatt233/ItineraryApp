@@ -1,8 +1,10 @@
-import { useItinerary } from "../../pages/itinerary/Itinerary";
+import { usePage } from "../../App";
+import { useItinerary } from "./Itinerary";
 import { activityRequests } from "../../requests/activityRequests";
-import { useActivity } from "../view/Activities";
+import { useActivity } from "./view/Activities";
 
 export default function DeleteActivity({ modal }) {
+  const { setError } = usePage();
   const { itinerary, setItinerary } = useItinerary();
   const { setModal } = useActivity();
   const { deleteActivity } = activityRequests();
@@ -22,7 +24,11 @@ export default function DeleteActivity({ modal }) {
       setItinerary(updatedItinerary);
       setModal(false);
     } else {
-      alert(`Error ${response.status}: ${data.error}`);
+      setError({
+        status: response.status,
+        message: data.error,
+        setError: setError,
+      });
     }
   };
 

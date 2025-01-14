@@ -1,10 +1,10 @@
-import Error from "./pages/Error";
-import CreateItinerary from "./pages/itinerary/CreateItinerary";
-import Itineraries from "./pages/itinerary/Itineraries";
-import Itinerary from "./pages/itinerary/Itinerary";
-import Login from "./pages/user/Login";
-import SignUp from "./pages/user/SignUp";
-import User from "./pages/user/User";
+import Error from "./resources/Error";
+import CreateItinerary from "./resources/itineraries/CreateItinerary";
+import Itineraries from "./resources/itineraries/Itineraries";
+import Itinerary from "./resources/activities/Itinerary";
+import Login from "./resources/auth/Login";
+import SignUp from "./resources/auth/SignUp";
+import User from "./resources/auth/User";
 
 export default function RenderPage({ user, page }) {
   if (user) {

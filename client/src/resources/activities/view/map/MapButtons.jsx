@@ -1,7 +1,7 @@
 import { useRef } from "react";
-import { useItinerary } from "../../../pages/itinerary/Itinerary";
+import { useItinerary } from "../../Itinerary";
 import { useActivity } from "../Activities";
-import { removeTime } from "../../functions/formatDate";
+import { removeTime } from "../../../functions/formatDate";
 
 export default function MapButtons() {
   const { itinerary, setShowMap, setShowCalendar } = useItinerary();

@@ -23,7 +23,7 @@ const getItineraries = async (req, res) => {
 
     res.status(200).json(itineraries);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -38,12 +38,12 @@ const getItineraryById = async (req, res) => {
     });
 
     if (!itinerary) {
-      return res.status(404).json({ message: "Itinerary not found" });
+      return res.status(404).json({ error: "Itinerary not found" });
     }
 
     res.status(200).json(itinerary);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -51,7 +51,7 @@ const createItinerary = async (req, res) => {
   const { title, startDate, endDate } = req.body;
 
   if (hasEmptyInputs(req.body)) {
-    return res.status(400).json({ message: "All fields must be completed." });
+    return res.status(400).json({ error: "All fields must be completed." });
   }
 
   try {
@@ -67,7 +67,7 @@ const createItinerary = async (req, res) => {
 
     res.status(201).json(newItinerary);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -76,7 +76,7 @@ const updateItinerary = async (req, res) => {
   const { title, startDate, endDate, activities, notes, completed } = req.body;
 
   if (hasEmptyInputs(req.body)) {
-    return res.status(400).json({ message: "All fields must be completed." });
+    return res.status(400).json({ error: "All fields must be completed." });
   }
 
   try {
@@ -87,7 +87,7 @@ const updateItinerary = async (req, res) => {
     });
 
     if (!itinerary) {
-      return res.status(404).json({ message: "Itinerary not found" });
+      return res.status(404).json({ error: "Itinerary not found" });
     }
 
     // Update itinerary, only if new value is provided
@@ -102,7 +102,7 @@ const updateItinerary = async (req, res) => {
 
     res.status(200).json(updatedItinerary);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -117,13 +117,13 @@ const deleteItinerary = async (req, res) => {
     });
 
     if (!itinerary) {
-      return res.status(404).json({ message: "Itinerary not found" });
+      return res.status(404).json({ error: "Itinerary not found" });
     }
 
     await itinerary.deleteOne();
     res.status(200).json({ message: "Successfully deleted itinerary" });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 

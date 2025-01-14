@@ -1,15 +1,12 @@
 import { useState } from "react";
 import { usePage } from "../../App";
 import { useAuth } from "../../context/AuthContext";
-import { authRequests } from "../../requests/authRequests";
 
-export default function SignUp() {
+export default function Login() {
   const { login } = useAuth();
-  const { fetchSignup } = authRequests();
-  const { setPage } = usePage();
+  const { setPage, setError } = usePage();
   const [formData, setFormData] = useState({
     email: "",
-    username: "",
     password: "",
   });
 
@@ -21,29 +18,21 @@ export default function SignUp() {
     }));
   };
 
-  const signUp = async (e) => {
+  const loginApi = async (e) => {
     e.preventDefault();
+    const res = await login(formData);
+    const { response, data } = res;
 
-    const { response, data } = await fetchSignup(formData);
-
-    if (response.ok) {
-      await login(formData);
-    } else {
-      alert(`Error ${response.status}: ${data.error}`);
+    if (!response.ok) {
+      setError({ status: response.status, message: data.error });
     }
   };
 
   return (
     <div className="page-layout">
+      <title>Login</title>
       <form className="w-[350px] bg-white modal">
-        <p className="text-center text-lg">Sign Up</p>
-        <label htmlFor="name">Username</label>
-        <input
-          type="text"
-          name="username"
-          className="basic-input"
-          onChange={handleChange}
-        />
+        <p className="text-center text-lg">Login</p>
         <label htmlFor="email">Email</label>
         <input
           type="email"
@@ -58,15 +47,15 @@ export default function SignUp() {
           className="basic-input"
           onChange={handleChange}
         />
-        <button type="submit" className="basic-button" onClick={signUp}>
-          Sign Up
+        <button type="submit" className="basic-button" onClick={loginApi}>
+          Log In
         </button>
 
         <button
           className="link-button w-fit mx-auto"
-          onClick={() => setPage("login")}
+          onClick={() => setPage("signup")}
         >
-          Already have an account? Log in here!
+          No account? Sign up here!
         </button>
       </form>
     </div>

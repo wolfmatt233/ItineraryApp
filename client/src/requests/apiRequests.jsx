@@ -2,10 +2,10 @@ import { usePage } from "../App";
 import { useAuth } from "../context/AuthContext";
 
 export const apiRequests = () => {
-  const { setPageLoading } = usePage();
+  const { setPageLoading, setError } = usePage();
   const { refreshLogin } = useAuth();
 
-  // If 404, try refreshing token, if not complete the given request
+  // If 403, try refreshing token, if not complete the given request
   const retryForbidden = async (fetchFunction, args, hasRefreshed = false) => {
     // if id and _id exist, remove _id (for PHP api)
     args.forEach((arg) => {
@@ -23,6 +23,11 @@ export const apiRequests = () => {
       if (response.status === 403 && !hasRefreshed) {
         await refreshLogin();
         return retryForbidden(fetchFunction, [...args], true);
+      } else if (!response.ok) {
+        setError({
+          status: response.status,
+          message: data.error,
+        });
       }
 
       setPageLoading(false);

@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { authRequests } from "../requests/authRequests";
+import { usePage } from "../App";
 
 const AuthContext = createContext();
 
@@ -48,13 +49,13 @@ export const AuthProvider = ({ children }) => {
     const res = await fetchLogin(formData);
     const { response, data } = res;
 
-    if (data.accessToken && data.refreshToken) {
+    if (response.ok && data.accessToken && data.refreshToken) {
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
 
       await getUser();
     } else {
-      alert("Invalid credentials");
+      return res;
     }
   };
 

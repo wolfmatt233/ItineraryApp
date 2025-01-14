@@ -28,7 +28,7 @@ const createActivity = async (req, res) => {
     req.body;
 
   if (hasEmptyInputs(req.body)) {
-    return res.status(400).json({ message: "All fields must be completed." });
+    return res.status(400).json({ error: "All fields must be completed." });
   }
 
   try {
@@ -58,7 +58,7 @@ const updateActivity = async (req, res) => {
     req.body;
 
   if (hasEmptyInputs(req.body)) {
-    return res.status(400).json({ message: "All fields must be completed." });
+    return res.status(400).json({ error: "All fields must be completed." });
   }
 
   try {
@@ -70,7 +70,7 @@ const updateActivity = async (req, res) => {
     });
 
     if (!activity) {
-      return res.status(404).json({ message: "Activity not found" });
+      return res.status(404).json({ error: "Activity not found" });
     }
 
     // Update activity, only if new value is provided
@@ -103,7 +103,7 @@ const deleteActivity = async (req, res) => {
     });
 
     if (!activity) {
-      return res.status(404).json({ message: "Activity not found" });
+      return res.status(404).json({ error: "Activity not found" });
     }
 
     await activity.deleteOne();

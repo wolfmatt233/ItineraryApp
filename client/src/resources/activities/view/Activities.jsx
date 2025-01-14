@@ -9,9 +9,9 @@ import {
 import ActivityMap from "./map/ActivityMap";
 import ActivityList from "./ActivityList";
 import MapButtons from "./map/MapButtons";
-import DeleteActivity from "../delete/DeleteActivity";
-import { useItinerary } from "../../pages/itinerary/Itinerary";
-import { sortDates } from "../functions/mapFunctions";
+import DeleteActivity from "../DeleteActivity";
+import { useItinerary } from "../Itinerary";
+import { sortDates } from "../../functions/mapFunctions";
 
 const ActivityContext = createContext();
 export const useActivity = () => useContext(ActivityContext);

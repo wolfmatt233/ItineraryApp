@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { authRequests } from "../../requests/authRequests";
+import { usePage } from "../../App";
 
 export default function User() {
   const { user, logout } = useAuth();
+  const { setError } = usePage();
   const { changePassword, deleteAccount } = authRequests();
   const [action, setAction] = useState();
   const [formData, setFormData] = useState({
@@ -30,9 +32,10 @@ export default function User() {
 
       if (response.ok) {
         setAction(null);
+        setError({ status: 200, message: data.message });
+      } else {
+        setError({ status: response.status, message: data.error });
       }
-
-      alert(data.message || data.error);
     } else if (action === "delete") {
       // send current info to confirm & delete
       const res = await deleteAccount(formData);
@@ -41,27 +44,27 @@ export default function User() {
       if (response.ok) {
         setAction(null);
         logout();
+        setError({ status: 200, message: data.message });
+      } else {
+        setError({ status: response.status, message: data.error });
       }
-
-      alert(data.message || data.error);
     }
   };
 
   return (
     <div className="page-layout flex flex-col">
-      <p className="text-lg py-2 border-b mb-5">
-        Your Account: {user.username}
-      </p>
+      <title>Your Account</title>
+      <p className="page-title">Your Account: {user.username}</p>
 
       <button
-        className="basic-button p-2 mb-3"
+        className="basic-button p-2 mb-3 max-sm:rounded-none"
         onClick={() => setAction("password")}
       >
         <i className="fa-solid fa-user-pen mr-2"></i>
         Change Password
       </button>
       <button
-        className="basic-button-red p-2 site-red hover:bg-[#fc1a1a]"
+        className="basic-button-red p-2 site-red hover:bg-[#fc1a1a] max-sm:rounded-none"
         onClick={() => setAction("delete")}
       >
         <i className="fa-solid fa-user-xmark mr-2"></i>
@@ -111,7 +114,7 @@ export default function User() {
                 className="basic-button"
                 onClick={handleSubmit}
               >
-                { action == "password" ? "Update Password" : "Delete Account"}
+                {action == "password" ? "Update Password" : "Delete Account"}
               </button>
             </form>
           </div>

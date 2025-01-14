@@ -1,69 +1,70 @@
 import { useState } from "react";
-import { useItinerary } from "../../pages/itinerary/Itinerary";
-import { removeTime } from "../functions/formatDate";
+import { useItinerary } from "../../resources/activities/Itinerary";
 import { activityRequests } from "../../requests/activityRequests";
+import { removeTime } from "../../resources/functions/formatDate";
 
-export default function AddForm({ setLocation, location }) {
-  const { id, itinerary, setItinerary, setShowMap } = useItinerary();
-  const { createActivity } = activityRequests();
-  const [newActivity, setNewActivity] = useState({
-    date: "",
-    activity: "",
-    locationName: location === "none" ? "" : location.name.split(",")[0],
-    locationLat: location === "none" ? 0 : location.position[0],
-    locationLon: location === "none" ? 0 : location.position[1],
-    notes: "",
-    completed: false,
-  });
+export default function EditActivity({ activityId, setActivityId }) {
+  const { itinerary, setItinerary } = useItinerary();
+  const { updateActivity } = activityRequests();
+  const [updatedActivity, setUpdatedActivity] = useState(
+    itinerary.activities.filter((activity) => activity._id === activityId)[0]
+  );
   const [datetime, setDatetime] = useState({
-    date: itinerary.startDate.split("T")[0],
-    time: "",
+    date: updatedActivity.date.split("T")[0],
+    time: updatedActivity.date.split("T")[1].replace(/:00$/, ""),
   });
-  const [editToggle, setEditToggle] = useState(() => {
-    return location === "none" ? true : false;
-  });
+  const [editToggle, setEditToggle] = useState(false);
 
   const handleChange = (e) => {
-    let { name, value, type, checked } = e.target;
+    let { name, value, checked, type } = e.target;
 
-    if (name === "date" || name === "time") {
-      setDatetime((prevData) => ({
+    if (type === "checkbox") {
+      setUpdatedActivity((prevData) => ({
         ...prevData,
-        [name]: value,
+        [name]: checked,
       }));
+    } else if (name === "date" || name === "time") {
+      setDatetime((prev) => {
+        return {
+          ...prev,
+          [name]: value,
+        };
+      });
     } else {
-      setNewActivity((prevData) => ({
-        ...prevData,
-        [name]: type === "checkbox" ? checked : value,
-      }));
+      setUpdatedActivity((prevData) => {
+        return {
+          ...prevData,
+          [name]: value,
+        };
+      });
     }
   };
 
-  const handleClose = (e) => {
-    setLocation(false);
-    setShowMap(false);
-  };
-
-  const handleSave = async (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
 
-    const { date, time } = datetime;
-
     const activityWithTime = {
-      ...newActivity,
-      date: `${date}T${time}:00`,
+      ...updatedActivity,
+      date: `${datetime.date}T${datetime.time}:00`,
     };
 
-    const res = await createActivity(id, activityWithTime);
+    const res = await updateActivity(
+      itinerary._id,
+      activityWithTime._id,
+      activityWithTime
+    );
     const { response, data } = res;
 
     if (response.ok) {
       const updatedItinerary = {
         ...itinerary,
-        activities: [...itinerary.activities, data],
+        activities: itinerary.activities.map((activity) =>
+          activity._id === activityId ? data : activity
+        ),
       };
+
       setItinerary(updatedItinerary);
-      handleClose();
+      setActivityId(false);
     } else {
       alert(`Error ${response.status}: ${data.error}`);
     }
@@ -71,25 +72,25 @@ export default function AddForm({ setLocation, location }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[5000]">
-      <div className="modal w-3/4 bg-white">
+      <div className="modal w-4/5 max-sm:w-full bg-white">
         <form className="flex flex-col">
-          <p className="page-title text-lg">Add Location</p>
+          <p className="text-lg font-semibold">Edit Activity</p>
           {editToggle ? (
             <>
-              <label htmlFor="locationName">Location</label>
+              <label htmlFor="locationName">Location Name</label>
               <input
                 type="text"
                 name="locationName"
                 className="basic-input"
-                value={newActivity.locationName}
                 onChange={handleChange}
+                value={updatedActivity.locationName}
               />
               <label htmlFor="locationLat">Latitude</label>
               <input
                 type="number"
                 name="locationLat"
                 className="basic-input"
-                value={newActivity.locationLat}
+                value={updatedActivity.locationLat}
                 onChange={handleChange}
               />
               <label htmlFor="locationLon">Longitude</label>
@@ -97,14 +98,14 @@ export default function AddForm({ setLocation, location }) {
                 type="number"
                 name="locationLon"
                 className="basic-input"
-                value={newActivity.locationLon}
+                value={updatedActivity.locationLon}
                 onChange={handleChange}
               />
             </>
           ) : (
             <div className="flex items-center">
               <p>
-                New Location Selected: <b>{newActivity.locationName}</b>
+                Location: <b>{updatedActivity.locationName}</b>
               </p>
               <i
                 className="fa-solid fa-pen-to-square ml-2 basic-button h-7 w-7 flex items-center justify-center cursor-pointer"
@@ -118,9 +119,9 @@ export default function AddForm({ setLocation, location }) {
             name="date"
             min={removeTime(itinerary.startDate)}
             max={removeTime(itinerary.endDate)}
-            value={datetime.date}
             className="basic-input"
             onChange={handleChange}
+            value={datetime.date}
           />
           <label htmlFor="time">Time</label>
           <input
@@ -128,6 +129,7 @@ export default function AddForm({ setLocation, location }) {
             name="time"
             className="basic-input"
             onChange={handleChange}
+            value={datetime.time}
           />
           <label htmlFor="activity">Activity</label>
           <input
@@ -135,6 +137,7 @@ export default function AddForm({ setLocation, location }) {
             name="activity"
             className="basic-input"
             onChange={handleChange}
+            value={updatedActivity.activity}
           />
           <div>
             <label htmlFor="completed">Completed</label>
@@ -142,7 +145,7 @@ export default function AddForm({ setLocation, location }) {
               type="checkbox"
               name="completed"
               className="ml-2"
-              checked={newActivity.completed}
+              checked={updatedActivity.completed}
               onChange={handleChange}
             />
           </div>
@@ -152,21 +155,22 @@ export default function AddForm({ setLocation, location }) {
             rows={4}
             className="basic-input"
             onChange={handleChange}
+            value={updatedActivity.notes}
           ></textarea>
           <div className="flex items-center">
             <button
               type="button"
-              className="h-10 border border-gray-300 hover:bg-gray-200 mr-2 w-1/2 cursor-pointer"
-              onClick={handleClose}
+              className="h-10 border border-gray-300 hover:bg-gray-200 mr-2 w-1/2"
+              onClick={() => setActivityId(false)}
             >
               Cancel
             </button>
             <button
               type="submit"
               className="h-10 border text-white bg-[#4ABDAC] hover:bg-[#F7B733] w-1/2"
-              onClick={handleSave}
+              onClick={handleUpdate}
             >
-              Add Activity
+              Update Activity
             </button>
           </div>
         </form>

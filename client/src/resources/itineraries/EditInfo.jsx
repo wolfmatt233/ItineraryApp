@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { removeTime } from "../functions/formatDate";
+import { removeTime } from "../../resources/functions/formatDate";
 import { itineraryRequests } from "../../requests/itineraryRequests";
-import { useItinerary } from "../../pages/itinerary/Itinerary";
+import { useItinerary } from "../../resources/activities/Itinerary";
 
 export default function EditInfo() {
   const { id, itinerary, setItinerary, showCalendar, setShowCalendar } =

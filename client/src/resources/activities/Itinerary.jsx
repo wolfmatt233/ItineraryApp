@@ -1,12 +1,12 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import EditInfo from "../../itineraries/edit/EditInfo";
-import AddActivity from "../../itineraries/add/AddActivity";
-import ActivityCalendar from "../../itineraries/view/ActivityCalendar";
-import EditActivity from "../../itineraries/edit/EditActivity";
+import EditInfo from "../itineraries/EditInfo";
+import AddActivity from "./add/AddActivity";
+import ActivityCalendar from "./view/ActivityCalendar";
+import EditActivity from "./EditActivity";
 import { itineraryRequests } from "../../requests/itineraryRequests";
 import { activityRequests } from "../../requests/activityRequests";
 import { usePage } from "../../App";
-import Activities from "../../itineraries/view/Activities";
+import Activities from "./view/Activities";
 import Loading from "../../layouts/Loading";
 
 const ItineraryContext = createContext();
@@ -35,10 +35,7 @@ export default function Itinerary({ id }) {
       setItinerary(combinedItinerary);
       setLoading(false);
     } else {
-      const status = itinRes.response.status || actRes.response.status;
-      const error = itinRes.data.error || actRes.data.error;
       setPage("itineraries");
-      alert(`Error ${status}: ${error}`);
     }
   };
 
@@ -73,6 +70,7 @@ export default function Itinerary({ id }) {
 
   return (
     <ItineraryContext.Provider value={contextSharing}>
+      <title>{itinerary ? itinerary.title : ""}</title>
       {itinerary && (
         <div className="page-layout flex flex-col">
           <EditInfo />

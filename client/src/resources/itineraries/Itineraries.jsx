@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { usePage } from "../../App";
-import { formatDate } from "../../itineraries/functions/formatDate";
-import DeleteItinerary from "../../itineraries/delete/DeleteItinerary";
+import { formatDate } from "../functions/formatDate";
+import DeleteItinerary from "./DeleteItinerary";
 import Loading from "../../layouts/Loading";
 import { itineraryRequests } from "../../requests/itineraryRequests";
 
@@ -20,7 +20,6 @@ export default function Itineraries() {
     if (response.ok && data) {
       setItineraries(data);
     } else {
-      alert(`Error ${response.status}: ${data.error}`);
       setItineraries([]);
     }
 
@@ -35,6 +34,7 @@ export default function Itineraries() {
 
   return (
     <div className="page-layout relative">
+      <title>Your Itineraries</title>
       <div className="page-title">
         <p className="text-lg">Your Itineraries</p>
         <i
@@ -74,6 +74,7 @@ export default function Itineraries() {
                 id={item._id}
                 name={item.title}
                 setModal={setModal}
+                setEdit={setEdit}
                 setItineraries={setItineraries}
               />
             )}

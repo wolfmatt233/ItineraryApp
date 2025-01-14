@@ -16,15 +16,19 @@ const login = async (req, res) => {
     // Find user
     const user = await User.findOne({ email });
 
+    if (!email || !password) {
+      return res.status(400).json({ error: "All fields must be completed." });
+    }
+
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({ error: "Invalid credentials" });
     }
 
     // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({ error: "Invalid credentials" });
     }
 
     // Generate JWT (short term)
@@ -49,7 +53,7 @@ const login = async (req, res) => {
       message: "Logged in successfully",
     });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -59,12 +63,12 @@ const getUser = async (req, res) => {
     const user = await User.findById(req.user.id);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -72,7 +76,7 @@ const refreshToken = async (req, res) => {
   const refreshToken = req.header("Authorization")?.split(" ")[1];
 
   if (!refreshToken) {
-    return res.status(401).json({ message: "Refresh token is required" });
+    return res.status(401).json({ error: "Refresh token is required" });
   }
 
   try {
@@ -83,7 +87,7 @@ const refreshToken = async (req, res) => {
     const user = await User.findById(decoded.id);
 
     if (!user || user.refreshToken !== refreshToken) {
-      return res.status(403).json({ message: "Invalid refresh token" });
+      return res.status(403).json({ error: "Invalid refresh token" });
     }
 
     // Generate new access token
@@ -98,12 +102,16 @@ const refreshToken = async (req, res) => {
       accessToken: newAccessToken,
     });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
 const register = async (req, res) => {
   const { username, password, email } = req.body; //retrieve input vars
+
+  if (!email || !password || !username) {
+    return res.status(400).json({ error: "All fields must be completed." });
+  }
 
   try {
     //check if username or email is in use
@@ -112,7 +120,7 @@ const register = async (req, res) => {
     if (existingUser) {
       return res
         .status(400)
-        .json({ message: "Username or email already exists" });
+        .json({ error: "Username or email already exists" });
     }
 
     // Hash password
@@ -125,7 +133,7 @@ const register = async (req, res) => {
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -143,7 +151,7 @@ const changePassword = async (req, res) => {
 
     res.status(201).json({ message: "Password changed successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -156,7 +164,7 @@ const deleteAccount = async (req, res) => {
 
     res.status(201).json({ message: "Account successfully deleted" });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 

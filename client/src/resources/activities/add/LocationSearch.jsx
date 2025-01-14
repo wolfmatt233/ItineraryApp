@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { clickMarker } from "../functions/mapFunctions";
+import { clickMarker } from "../../functions/mapFunctions";
 
 export default function LocationSearch({
   setMarkers,

@@ -7,7 +7,7 @@ const reAuthMiddleware = async (req, res, next) => {
   const refreshToken = req.header("Authorization")?.split(" ")[1];
 
   if (!refreshToken) {
-    return res.status(401).json({ message: "Refresh token is required" });
+    return res.status(401).json({ error: "Refresh token is required" });
   }
 
   try {
@@ -16,14 +16,14 @@ const reAuthMiddleware = async (req, res, next) => {
 
     // No email exists or email does not match current user
     if (!user || user._id != decodedToken.id) {
-      return res.status(400).json({ message: "Invalid email" });
+      return res.status(400).json({ error: "Invalid email" });
     }
 
     // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
+      return res.status(400).json({ error: "Invalid password" });
     }
 
     req.reAuth = user;
@@ -31,7 +31,7 @@ const reAuthMiddleware = async (req, res, next) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Internal server error" });
+      .json({ error: "Internal server error" });
   }
 };
 

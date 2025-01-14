@@ -1,8 +1,11 @@
+// Libs
 import { useEffect, useRef, useState } from "react";
+// Components
 import LocationSearch from "./LocationSearch";
 import AddForm from "./AddForm";
 import SelectMap from "./SelectMap";
-import { useItinerary } from "../../pages/itinerary/Itinerary";
+// Other
+import { useItinerary } from "../Itinerary";
 
 export default function AddActivity() {
   const { setShowMap } = useItinerary();

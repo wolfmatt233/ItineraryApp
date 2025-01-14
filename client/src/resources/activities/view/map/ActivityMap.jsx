@@ -1,3 +1,4 @@
+// Libs
 import {
   MapContainer,
   Marker,
@@ -6,12 +7,14 @@ import {
   TileLayer,
   ZoomControl,
 } from "react-leaflet";
-import { useActivity } from "../Activities";
-import { createNumberedIcon, sortDates } from "../../functions/mapFunctions";
-import MapUpdater from "./MapUpdater";
 import MarkerClusterGroup from "react-leaflet-markercluster";
-import { useItinerary } from "../../../pages/itinerary/Itinerary";
-import { convertDate, getTime } from "../../functions/formatDate";
+// Components
+import MapUpdater from "./MapUpdater";
+// Other
+import { useActivity } from "../Activities";
+import { createNumberedIcon, sortDates } from "../../../functions/mapFunctions";
+import { useItinerary } from "../../Itinerary";
+import { convertDate, getTime } from "../../../functions/formatDate";
 
 export default function ActivityMap({ activities }) {
   const { setShowMap, setActivityId } = useItinerary();

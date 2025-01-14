@@ -1,26 +1,47 @@
 import { useAuth } from "../context/AuthContext";
 import { usePage } from "../App";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Nav() {
   const { user, logout } = useAuth();
-  const { setPage } = usePage();
+  const { setPage, page } = usePage();
   const [toggleDropdown, setToggleDropdown] = useState(false);
+
+  useEffect(() => {
+    setToggleDropdown(false);
+  }, [page]);
 
   return (
     <div className="site-green text-white relative shadow-md">
       {toggleDropdown && (
-        <div className="absolute top-0 left-0 w-[70vw] h-screen bg-gray-100 z-[10000] border-r">
-          <i
-            class="fa-solid fa-xmark site-green h-14 flex items-center justify-center site-green hover:site-yellow cursor-pointer border-b"
-            onClick={() => setToggleDropdown((prev) => !prev)}
-          ></i>
-          <button className="site-green h-14 w-full flex items-center justify-center site-green hover:site-yellow cursor-pointer border-b">
-            <i className="fa-solid fa-map mr-1"></i> Itineraries
-          </button>
-          <button className=" site-green h-14 w-full flex items-center justify-center site-green hover:site-yellow cursor-pointer border-b">
-            <i className="fa-solid fa-plus mr-1"></i> Create Itinerary
-          </button>
+        <div>
+          <div className="absolute top-0 left-0 w-[70vw] h-screen bg-gray-100 z-[10000] border-r">
+            <i
+              class="fa-solid fa-xmark site-green h-14 flex items-center justify-center site-green hover:site-yellow cursor-pointer border-b"
+              onClick={() => setToggleDropdown((prev) => !prev)}
+            ></i>
+            <button
+              className="site-green h-14 w-full flex items-center justify-center site-green hover:site-yellow cursor-pointer border-b"
+              onClick={() => setPage("itineraries")}
+            >
+              <i className="fa-solid fa-map mr-1"></i> Itineraries
+            </button>
+            <button
+              className=" site-green h-14 w-full flex items-center justify-center site-green hover:site-yellow cursor-pointer border-b"
+              onClick={() => setPage("create-itinerary")}
+            >
+              <i className="fa-solid fa-plus mr-1"></i> Create Itinerary
+            </button>
+          </div>
+          <div
+            id="modal-background"
+            className="absolute w-[70vw] right-0 h-screen bg-black bg-opacity-50 z-[6000]"
+            onClick={(e) => {
+              if (e.target.id === "modal-background") {
+                setToggleDropdown((prev) => !prev);
+              }
+            }}
+          ></div>
         </div>
       )}
 

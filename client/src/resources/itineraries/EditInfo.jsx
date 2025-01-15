@@ -21,7 +21,7 @@ export default function EditInfo() {
   };
 
   const cancelEdit = () => {
-    setItinerary(itinerary);
+    setUpdatedItinerary(itinerary);
     setEdit(false);
   };
 
@@ -35,8 +35,6 @@ export default function EditInfo() {
     if (response.ok) {
       setItinerary(updatedItinerary);
       setEdit(false);
-    } else {
-      alert(`Error ${response.status}: ${data.error}`);
     }
   };
 

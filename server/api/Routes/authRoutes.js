@@ -2,6 +2,8 @@ import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../Models/User.js";
+import Itinerary from "../Models/Itinerary.js";
+import Activity from "../Models/Activity.js";
 import authMiddleware from "../Middleware/authMiddleware.js";
 import reAuthMiddleware from "../Middleware/reAuthMiddleware.js";
 
@@ -158,8 +160,11 @@ const changePassword = async (req, res) => {
 const deleteAccount = async (req, res) => {
   try {
     const user = req.reAuth;
+    const userId = user._id;
 
-    // Delete user
+    // Delete user & documents
+    await Itinerary.deleteMany({ userId });
+    await Activity.deleteMany({ userId });
     await user.deleteOne();
 
     res.status(201).json({ message: "Account successfully deleted" });

@@ -1,10 +1,12 @@
 # Itenerary MERN Full Stack App
 
+Author: [Matthew Wolf](https://www.linkedin.com/in/matthew-wolf2)
+
 [YouTube Demo](https://youtu.be/A3E1h_2jICQ)
 
-## Explanation
+## Description
 
-An itenerary website that allows you to create an itenerary on a day by day basis. Scheduling and times can be laid out. Use of a map to select locations to add.
+An itenerary website that allows you to create an travel itenerary on a day by day basis. Location and times can be laid out. A map can be used to select locations.
 
 ## Tech Stack (Express api)
 
@@ -66,7 +68,6 @@ An itenerary website that allows you to create an itenerary on a day by day basi
 
 - [ ] Error message handling (popups, modals, etc.)
 - [ ] Incorrect/empty input handling
-- [ ] Export activities to external calendar applications
 
 ## PHP Api
 
